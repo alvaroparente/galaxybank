@@ -1,0 +1,98 @@
+{% extends 'usuarios/base.html' %}
+
+{% block title %}Login - Galaxy Bank{% endblock %}
+
+{% block content %}
+<div class="min-vh-100 d-flex align-items-center justify-content-center" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-5">
+                <div class="card shadow-lg border-0">
+                    <div class="card-header text-center py-4">
+                        <h3 class="mb-0">
+                            <i class="bi bi-bank"></i> Galaxy Bank
+                        </h3>
+                        <p class="mb-0 mt-2 text-light">Acesse sua conta</p>
+                    </div>
+                    <div class="card-body p-5">
+                        <form method="post">
+                            {% csrf_token %}
+                            <div class="mb-4">
+                                <label for="username" class="form-label">
+                                    <i class="bi bi-person"></i> Usuário ou Email
+                                </label>
+                                <input 
+                                    type="text" 
+                                    class="form-control form-control-lg" 
+                                    id="username" 
+                                    name="username" 
+                                    required
+                                    placeholder="Digite seu usuário ou email"
+                                >
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label for="password" class="form-label">
+                                    <i class="bi bi-lock"></i> Senha
+                                </label>
+                                <input 
+                                    type="password" 
+                                    class="form-control form-control-lg" 
+                                    id="password" 
+                                    name="password" 
+                                    required
+                                    placeholder="Digite sua senha"
+                                >
+                            </div>
+                            
+                            <div class="d-grid mb-4">
+                                <button type="submit" class="btn btn-galaxy btn-lg">
+                                    <i class="bi bi-box-arrow-in-right"></i> Entrar
+                                </button>
+                            </div>
+                        </form>
+                        
+                        <div class="text-center">
+                            <a href="#" class="text-decoration-none">Esqueceu sua senha?</a>
+                        </div>
+                    </div>
+                    <div class="card-footer text-center bg-light">
+                        <small class="text-muted">
+                            <i class="bi bi-shield-check"></i> 
+                            Sua conexão é segura e criptografada
+                        </small>
+                    </div>
+                </div>
+                
+                <!-- Tipos de usuário info -->
+                <div class="row mt-4">
+                    <div class="col-4">
+                        <div class="card text-center border-0 bg-transparent">
+                            <div class="card-body text-white">
+                                <i class="bi bi-person-check fs-2"></i>
+                                <h6 class="mt-2">Cliente</h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="card text-center border-0 bg-transparent">
+                            <div class="card-body text-white">
+                                <i class="bi bi-headset fs-2"></i>
+                                <h6 class="mt-2">Atendente</h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        <div class="card text-center border-0 bg-transparent">
+                            <div class="card-body text-white">
+                                <i class="bi bi-person-badge fs-2"></i>
+                                <h6 class="mt-2">Gerente</h6>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

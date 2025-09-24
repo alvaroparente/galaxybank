@@ -1,0 +1,227 @@
+{% extends 'usuarios/base.html' %}
+
+{% block title %}Dashboard Cliente - Galaxy Bank{% endblock %}
+
+{% block content %}
+<div class="row g-0">
+    <!-- Sidebar -->
+    <div class="col-md-3 col-lg-2 sidebar">
+        <div class="p-3">
+            <h6 class="text-muted mb-3">MENU CLIENTE</h6>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link active" href="#">
+                        <i class="bi bi-speedometer2"></i> Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        <i class="bi bi-credit-card"></i> Minhas Contas
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        <i class="bi bi-arrow-left-right"></i> Transferências
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        <i class="bi bi-graph-up-arrow"></i> Investimentos
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        <i class="bi bi-cash-coin"></i> Empréstimos
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        <i class="bi bi-shop"></i> Shopping
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        <i class="bi bi-chat-dots"></i> Suporte
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="col-md-9 col-lg-10 main-content">
+        <div class="p-4">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2>Olá, {{ cliente.usuario.first_name }}!</h2>
+                    <p class="text-muted mb-0">Bem-vindo ao seu Galaxy Bank</p>
+                </div>
+                <div class="text-end">
+                    <small class="text-muted">CPF: {{ cliente.cpf }}</small><br>
+                    <small class="text-muted">Pontos: {{ cliente.score_pontos }}</small>
+                </div>
+            </div>
+
+            <!-- Cards de Resumo -->
+            <div class="row mb-4">
+                <div class="col-md-3 mb-3">
+                    <div class="card stats-card border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <i class="bi bi-wallet text-primary fs-1"></i>
+                            <h5 class="card-title mt-2">Saldo Total</h5>
+                            <h3 class="text-primary">R$ 15.720,50</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="card stats-card border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <i class="bi bi-graph-up text-success fs-1"></i>
+                            <h5 class="card-title mt-2">Investimentos</h5>
+                            <h3 class="text-success">R$ 8.450,00</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="card stats-card border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <i class="bi bi-credit-card text-warning fs-1"></i>
+                            <h5 class="card-title mt-2">Limite Crédito</h5>
+                            <h3 class="text-warning">R$ 5.000,00</h3>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="card stats-card border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <i class="bi bi-star-fill text-info fs-1"></i>
+                            <h5 class="card-title mt-2">Galaxy Points</h5>
+                            <h3 class="text-info">{{ cliente.score_pontos }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ações Rápidas -->
+            <div class="card mb-4 shadow-sm">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="bi bi-lightning"></i> Ações Rápidas</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-2 col-6 mb-3 text-center">
+                            <button class="btn btn-outline-primary btn-lg mb-2 w-100">
+                                <i class="bi bi-send"></i>
+                            </button>
+                            <small class="d-block">PIX</small>
+                        </div>
+                        <div class="col-md-2 col-6 mb-3 text-center">
+                            <button class="btn btn-outline-success btn-lg mb-2 w-100">
+                                <i class="bi bi-arrow-down-up"></i>
+                            </button>
+                            <small class="d-block">Transferir</small>
+                        </div>
+                        <div class="col-md-2 col-6 mb-3 text-center">
+                            <button class="btn btn-outline-warning btn-lg mb-2 w-100">
+                                <i class="bi bi-phone"></i>
+                            </button>
+                            <small class="d-block">Recarga</small>
+                        </div>
+                        <div class="col-md-2 col-6 mb-3 text-center">
+                            <button class="btn btn-outline-info btn-lg mb-2 w-100">
+                                <i class="bi bi-receipt"></i>
+                            </button>
+                            <small class="d-block">Pagar Conta</small>
+                        </div>
+                        <div class="col-md-2 col-6 mb-3 text-center">
+                            <button class="btn btn-outline-secondary btn-lg mb-2 w-100">
+                                <i class="bi bi-graph-up-arrow"></i>
+                            </button>
+                            <small class="d-block">Investir</small>
+                        </div>
+                        <div class="col-md-2 col-6 mb-3 text-center">
+                            <button class="btn btn-outline-dark btn-lg mb-2 w-100">
+                                <i class="bi bi-shop"></i>
+                            </button>
+                            <small class="d-block">Shopping</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Últimas Transações -->
+            <div class="row">
+                <div class="col-md-8">
+                    <div class="card shadow-sm">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="bi bi-clock-history"></i> Últimas Transações</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="list-group list-group-flush">
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-success rounded-circle p-2 me-3">
+                                            <i class="bi bi-arrow-down text-white"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-0">PIX Recebido</h6>
+                                            <small class="text-muted">João Silva - 24/09/2025 14:30</small>
+                                        </div>
+                                    </div>
+                                    <span class="text-success fw-bold">+R$ 150,00</span>
+                                </div>
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-danger rounded-circle p-2 me-3">
+                                            <i class="bi bi-arrow-up text-white"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-0">Compra no Débito</h6>
+                                            <small class="text-muted">Supermercado ABC - 24/09/2025 10:15</small>
+                                        </div>
+                                    </div>
+                                    <span class="text-danger fw-bold">-R$ 89,50</span>
+                                </div>
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-primary rounded-circle p-2 me-3">
+                                            <i class="bi bi-graph-up text-white"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-0">Rendimento CDB</h6>
+                                            <small class="text-muted">Investimento Galaxy - 23/09/2025 18:00</small>
+                                        </div>
+                                    </div>
+                                    <span class="text-success fw-bold">+R$ 45,20</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cartão Lateral -->
+                <div class="col-md-4">
+                    <div class="card shadow-sm">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="bi bi-gift"></i> Ofertas Especiais</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="alert alert-info">
+                                <i class="bi bi-star"></i>
+                                <strong>Galaxy Premium</strong><br>
+                                <small>Upgrade sua conta e ganhe benefícios exclusivos!</small>
+                            </div>
+                            <div class="alert alert-success">
+                                <i class="bi bi-percent"></i>
+                                <strong>CDB 12% a.a.</strong><br>
+                                <small>Invista já e faça seu dinheiro render!</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,327 @@
+{% extends 'usuarios/base.html' %}
+
+{% block title %}Dashboard Atendente - Galaxy Bank{% endblock %}
+
+{% block content %}
+<div class="row g-0">
+    <!-- Sidebar -->
+    <div class="col-md-3 col-lg-2 sidebar">
+        <div class="p-3">
+            <h6 class="text-muted mb-3">MENU ATENDENTE</h6>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link active" href="#">
+                        <i class="bi bi-speedometer2"></i> Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        <i class="bi bi-chat-dots"></i> Atendimentos
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        <i class="bi bi-people"></i> Clientes Online
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        <i class="bi bi-question-circle"></i> FAQ
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        <i class="bi bi-book"></i> Base de Conhecimento
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        <i class="bi bi-headset"></i> Configurações Bot
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        <i class="bi bi-bar-chart"></i> Relatórios
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="col-md-9 col-lg-10 main-content">
+        <div class="p-4">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2>Central de Atendimento</h2>
+                    <p class="text-muted mb-0">{{ atendente.nome_bot }} v{{ atendente.versao }}</p>
+                </div>
+                <div class="text-end">
+                    <span class="badge bg-success fs-6">
+                        <i class="bi bi-circle-fill"></i> Online
+                    </span><br>
+                    <small class="text-muted">Ativo desde: {{ atendente.data_criacao|date:"d/m/Y" }}</small>
+                </div>
+            </div>
+
+            <!-- Cards de Status -->
+            <div class="row mb-4">
+                <div class="col-md-3 mb-3">
+                    <div class="card stats-card border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <i class="bi bi-chat-dots-fill text-primary fs-1"></i>
+                            <h5 class="card-title mt-2">Conversas Hoje</h5>
+                            <h3 class="text-primary">247</h3>
+                            <small class="text-success"><i class="bi bi-arrow-up"></i> +15% vs ontem</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="card stats-card border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <i class="bi bi-clock-history text-warning fs-1"></i>
+                            <h5 class="card-title mt-2">Tempo Médio</h5>
+                            <h3 class="text-warning">2min 45s</h3>
+                            <small class="text-success"><i class="bi bi-arrow-down"></i> -8% melhor</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="card stats-card border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <i class="bi bi-emoji-smile-fill text-success fs-1"></i>
+                            <h5 class="card-title mt-2">Satisfação</h5>
+                            <h3 class="text-success">96.2%</h3>
+                            <small class="text-success"><i class="bi bi-arrow-up"></i> +2.1% este mês</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="card stats-card border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <i class="bi bi-check-circle-fill text-info fs-1"></i>
+                            <h5 class="card-title mt-2">Resolvidos</h5>
+                            <h3 class="text-info">89.4%</h3>
+                            <small class="text-success"><i class="bi bi-arrow-up"></i> +1.8% este mês</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Painel de Atendimento Ativo -->
+            <div class="row mb-4">
+                <div class="col-md-8">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="mb-0"><i class="bi bi-chat-square-dots"></i> Atendimentos Ativos</h5>
+                        </div>
+                        <div class="card-body p-0" style="max-height: 400px; overflow-y: auto;">
+                            <div class="list-group list-group-flush">
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-primary rounded-circle p-2 me-3">
+                                            <i class="bi bi-person text-white"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-0">Maria Santos</h6>
+                                            <small class="text-muted">Dúvida sobre PIX - Iniciado há 2min</small>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <span class="badge bg-warning">Aguardando</span>
+                                        <button class="btn btn-sm btn-primary ms-2">
+                                            <i class="bi bi-chat"></i> Atender
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-success rounded-circle p-2 me-3">
+                                            <i class="bi bi-person text-white"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-0">João Silva</h6>
+                                            <small class="text-muted">Problema com cartão - Em andamento há 5min</small>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <span class="badge bg-success">Em Atendimento</span>
+                                        <button class="btn btn-sm btn-success ms-2">
+                                            <i class="bi bi-chat-fill"></i> Continuar
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div class="d-flex align-items-center">
+                                        <div class="bg-info rounded-circle p-2 me-3">
+                                            <i class="bi bi-person text-white"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-0">Ana Costa</h6>
+                                            <small class="text-muted">Consulta de saldo - Iniciado há 1min</small>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <span class="badge bg-primary">Novo</span>
+                                        <button class="btn btn-sm btn-primary ms-2">
+                                            <i class="bi bi-chat"></i> Atender
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="card shadow-sm">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="bi bi-robot"></i> Status do Bot</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span>Sistema Principal</span>
+                                <span class="badge bg-success">Operacional</span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span>IA Conversacional</span>
+                                <span class="badge bg-success">Ativo</span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span>Base de Dados</span>
+                                <span class="badge bg-success">Conectado</span>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span>API Bancária</span>
+                                <span class="badge bg-warning">Lento</span>
+                            </div>
+                            
+                            <hr>
+                            
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between">
+                                    <small>CPU</small>
+                                    <small>45%</small>
+                                </div>
+                                <div class="progress">
+                                    <div class="progress-bar bg-info" style="width: 45%"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between">
+                                    <small>Memória</small>
+                                    <small>67%</small>
+                                </div>
+                                <div class="progress">
+                                    <div class="progress-bar bg-warning" style="width: 67%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Perguntas Frequentes e Estatísticas -->
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card shadow-sm">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="bi bi-question-circle"></i> Top 5 Dúvidas Hoje</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between">
+                                    <span>Como fazer PIX?</span>
+                                    <span class="badge bg-primary">47 vezes</span>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between">
+                                    <span>Consultar saldo</span>
+                                    <span class="badge bg-primary">35 vezes</span>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between">
+                                    <span>Desbloquear cartão</span>
+                                    <span class="badge bg-primary">28 vezes</span>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between">
+                                    <span>Segunda via de boleto</span>
+                                    <span class="badge bg-primary">21 vezes</span>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between">
+                                    <span>Atualizar dados</span>
+                                    <span class="badge bg-primary">18 vezes</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card shadow-sm">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="bi bi-graph-up"></i> Métricas da Semana</h5>
+                        </div>
+                        <div class="card-body">
+                            <!-- Gráfico simples com barras de progresso -->
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between">
+                                    <small>Segunda</small>
+                                    <small>180 atendimentos</small>
+                                </div>
+                                <div class="progress">
+                                    <div class="progress-bar" style="width: 72%"></div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between">
+                                    <small>Terça</small>
+                                    <small>210 atendimentos</small>
+                                </div>
+                                <div class="progress">
+                                    <div class="progress-bar" style="width: 84%"></div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between">
+                                    <small>Quarta</small>
+                                    <small>195 atendimentos</small>
+                                </div>
+                                <div class="progress">
+                                    <div class="progress-bar" style="width: 78%"></div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between">
+                                    <small>Quinta</small>
+                                    <small>250 atendimentos</small>
+                                </div>
+                                <div class="progress">
+                                    <div class="progress-bar bg-success" style="width: 100%"></div>
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <div class="d-flex justify-content-between">
+                                    <small>Hoje (Sexta)</small>
+                                    <small>247 atendimentos</small>
+                                </div>
+                                <div class="progress">
+                                    <div class="progress-bar bg-info" style="width: 98%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
