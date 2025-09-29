@@ -12,7 +12,7 @@
 ---
 
 ## Visão Geral
-Sistema de banco digital com autenticação para três tipos de usuários: **Cliente**, **Atendente** e **Gerente**. O projeto utiliza Django, Bootstrap 5 e segue boas práticas de organização e segurança.
+Sistema de banco digital com autenticação para dois tipos de usuários: **Cliente** e **Gerente**. O projeto utiliza Django, Bootstrap 5 e segue boas práticas de organização e segurança.
 
 ---
 
@@ -28,8 +28,6 @@ Sistema de banco digital com autenticação para três tipos de usuários: **Cli
 - **Shopping**: id_produto (PK), nome_produto, preco, pontos_necessarios
 - **Compra**: id_compra (PK), data_hora, id_cliente (FK), id_produto (FK)
 - **Gerente**: id_gerente (PK), nome, email, senha
-- **Atendente (ChatBot)**: id_atendente (PK), nome_bot, versao
-- **Atendimento**: id_atendimento (PK), data_hora, mensagem, id_cliente (FK), id_atendente (FK)
 
 ### Relacionamentos
 - Cliente possui Conta (1:N)
@@ -38,7 +36,6 @@ Sistema de banco digital com autenticação para três tipos de usuários: **Cli
 - Cliente pode solicitar Empréstimo (1:N) → autorizado por Gerente
 - Cliente investe em Investimentos (1:N)
 - Cliente compra Produtos no Shopping (N:M via Compra)
-- Cliente interage com Atendente (N:M via Atendimento)
 
 ---
 
@@ -46,8 +43,8 @@ Sistema de banco digital com autenticação para três tipos de usuários: **Cli
 
 ### Autenticação e Usuários
 - Modelo customizado de usuário (`Usuario`) baseado em `AbstractUser`.
-- Três tipos de usuário: Cliente, Gerente, Atendente.
-- Perfis específicos para cada tipo (Cliente, Gerente, Atendente).
+- Dois tipos de usuário: Cliente e Gerente.
+- Perfis específicos para cada tipo (Cliente e Gerente).
 - Backend de autenticação customizado (login por email ou username).
 - Redirecionamento automático para dashboard conforme tipo de usuário.
 - Sistema de mensagens e feedback.
@@ -92,7 +89,6 @@ Sistema de banco digital com autenticação para três tipos de usuários: **Cli
 | Admin     | admin                  | admin123     |
 | Cliente   | cliente@galaxy.com     | cliente123   |
 | Gerente   | gerente@galaxy.com     | gerente123   |
-| Atendente | atendente@galaxy.com   | atendente123 |
 
 ---
 
@@ -112,6 +108,7 @@ Sistema de banco digital com autenticação para três tipos de usuários: **Cli
 ## Histórico de Alterações
 
 - **24/09/2025**: Estrutura inicial, autenticação, dashboards, usuários de demonstração, documentação organizada.
+- **28/09/2025**: Removido modelo Atendente, mantidos apenas Cliente e Gerente.
 
 ---
 

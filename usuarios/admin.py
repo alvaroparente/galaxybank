@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import Usuario, Cliente, Gerente, Atendente
+from .models import Usuario, Cliente, Gerente
 
 @admin.register(Usuario)
 class UsuarioAdmin(UserAdmin):
@@ -24,10 +24,3 @@ class GerenteAdmin(admin.ModelAdmin):
     list_display = ('__str__', 'codigo_gerente', 'data_admissao', 'ativo')
     list_filter = ('ativo', 'data_admissao')
     search_fields = ('usuario__first_name', 'usuario__last_name', 'codigo_gerente')
-
-@admin.register(Atendente)
-class AtendenteAdmin(admin.ModelAdmin):
-    list_display = ('nome_bot', 'versao', 'ativo', 'data_criacao')
-    list_filter = ('ativo', 'versao', 'data_criacao')
-    search_fields = ('nome_bot', 'versao')
-    readonly_fields = ('data_criacao',)

@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.views.decorators.csrf import csrf_protect
 from django.http import HttpResponse
-from .models import Cliente, Gerente, Atendente
+from .models import Cliente, Gerente
 
 @csrf_protect
 def login_view(request):
@@ -41,8 +41,6 @@ def redirect_user_by_type(user):
         return redirect('dashboard_cliente')
     elif user.tipo_usuario == 'gerente':
         return redirect('dashboard_gerente')
-    elif user.tipo_usuario == 'atendente':
-        return redirect('dashboard_atendente')
     else:
         return redirect('login')
 
@@ -74,26 +72,8 @@ def dashboard_gerente(request):
         messages.error(request, 'Perfil de gerente não encontrado.')
         return redirect('login')
 
-@login_required
-def dashboard_atendente(request):
-    """Dashboard do atendente"""
-    try:
-        atendente = Atendente.objects.get(usuario=request.user)
-        context = {
-            'atendente': atendente,
-            'usuario': request.user,
-        }
-        return render(request, 'usuarios/dashboard_atendente.html', context)
-    except Atendente.DoesNotExist:
-        messages.error(request, 'Perfil de atendente não encontrado.')
-        return redirect('login')
-
 def home_redirect(request):
     """Redireciona para o dashboard apropriado ou login"""
     if request.user.is_authenticated:
         return redirect_user_by_type(request.user)
     return redirect('login')
-from django.http import HttpResponse
-
-def home(request):
-    return HttpResponse("Olá, mundo! Este é meu primeiro app Django.")

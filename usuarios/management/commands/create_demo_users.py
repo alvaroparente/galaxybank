@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand
 from django.contrib.auth import get_user_model
-from usuarios.models import Cliente, Gerente, Atendente
+from usuarios.models import Cliente, Gerente
 from datetime import date
 
 User = get_user_model()
@@ -74,29 +74,6 @@ class Command(BaseCommand):
                 self.style.SUCCESS(f'✓ Gerente criado: gerente / gerente123')
             )
         
-        # Criar usuário Atendente
-        if not User.objects.filter(username='atendente').exists():
-            atendente_user = User.objects.create_user(
-                username='atendente',
-                email='atendente@galaxy.com',
-                password='atendente123',
-                first_name='GalaxyBot',
-                last_name='Assistant',
-                tipo_usuario='atendente'
-            )
-            
-            # Criar perfil de atendente
-            Atendente.objects.create(
-                usuario=atendente_user,
-                nome_bot='GalaxyBot Assistant',
-                versao='2.1.0',
-                ativo=True
-            )
-            
-            self.stdout.write(
-                self.style.SUCCESS(f'✓ Atendente criado: atendente / atendente123')
-            )
-        
         # Criar mais alguns usuários de exemplo
         usuarios_exemplo = [
             {
@@ -152,7 +129,6 @@ class Command(BaseCommand):
         self.stdout.write('   • Admin: admin / admin123')
         self.stdout.write('   • Cliente: cliente / cliente123')
         self.stdout.write('   • Gerente: gerente / gerente123')
-        self.stdout.write('   • Atendente: atendente / atendente123')
         self.stdout.write(
             self.style.HTTP_INFO('\n🚀 Execute: python manage.py runserver')
         )
