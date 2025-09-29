@@ -1,0 +1,287 @@
+{% extends 'usuarios/base.html' %}
+
+{% block title %}Cadastro - {{ titulo }} - Galaxy Bank{% endblock %}
+
+{% block content %}
+<div class="min-vh-100 d-flex align-items-center justify-content-center" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <div class="card card-galaxy shadow-lg">
+                    <!-- Header do Card -->
+                    <div class="card-header bg-galaxy-gradient text-white text-center">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <a href="{% url 'usuarios:registro_etapa2' %}" class="btn btn-sm btn-outline-light">
+                                <i class="bi bi-arrow-left"></i>
+                            </a>
+                            <div>
+                                <h4 class="mb-0">
+                                    <i class="bi bi-bank"></i> Galaxy Bank
+                                </h4>
+                                <small>Cadastro de Nova Conta</small>
+                            </div>
+                            <a href="{% url 'usuarios:registro_cancelar' %}" class="btn btn-sm btn-outline-light" onclick="return confirm('Deseja cancelar o cadastro?')">
+                                <i class="bi bi-x"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="card-body p-4">
+                        <!-- Progress Bar -->
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <small class="text-muted">Etapa {{ etapa_atual }} de {{ total_etapas }}</small>
+                                <small class="text-muted">100%</small>
+                            </div>
+                            <div class="progress mb-3" style="height: 6px;">
+                                <div class="progress-bar bg-galaxy-gradient" role="progressbar" 
+                                     style="width: 100%"></div>
+                            </div>
+                        </div>
+
+                        <!-- Título da Etapa -->
+                        <div class="text-center mb-4">
+                            <h3 class="fw-bold text-primary">{{ titulo }}</h3>
+                            <p class="text-muted">{{ subtitulo }}</p>
+                        </div>
+
+                        <!-- Formulário -->
+                        <form method="post" novalidate>
+                            {% csrf_token %}
+                            
+                            {% if form.errors %}
+                                <div class="alert alert-danger">
+                                    <h6><i class="bi bi-exclamation-triangle"></i> Corrija os erros abaixo:</h6>
+                                    {{ form.errors }}
+                                </div>
+                            {% endif %}
+
+                            <div class="mb-3">
+                                <label for="id_username" class="form-label">
+                                    <i class="bi bi-person-circle"></i> {{ form.username.label }}
+                                </label>
+                                {{ form.username }}
+                                {% if form.username.errors %}
+                                    <div class="text-danger small">{{ form.username.errors.0 }}</div>
+                                {% endif %}
+                                {% if form.username.help_text %}
+                                    <div class="form-text">{{ form.username.help_text }}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="id_password1" class="form-label">
+                                    <i class="bi bi-lock"></i> {{ form.password1.label }}
+                                </label>
+                                {{ form.password1 }}
+                                {% if form.password1.errors %}
+                                    <div class="text-danger small">{{ form.password1.errors.0 }}</div>
+                                {% endif %}
+                                {% if form.password1.help_text %}
+                                    <div class="form-text">{{ form.password1.help_text }}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="id_password2" class="form-label">
+                                    <i class="bi bi-lock-fill"></i> {{ form.password2.label }}
+                                </label>
+                                {{ form.password2 }}
+                                {% if form.password2.errors %}
+                                    <div class="text-danger small">{{ form.password2.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Termos de Uso -->
+                            <div class="mb-4">
+                                <div class="form-check">
+                                    {{ form.aceitar_termos }}
+                                    <label class="form-check-label" for="id_aceitar_termos">
+                                        {{ form.aceitar_termos.label }}
+                                    </label>
+                                    {% if form.aceitar_termos.errors %}
+                                        <div class="text-danger small">{{ form.aceitar_termos.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                                <small class="text-muted">
+                                    <a href="#" data-bs-toggle="modal" data-bs-target="#termosModal">Ler termos de uso</a> |
+                                    <a href="#" data-bs-toggle="modal" data-bs-target="#privacidadeModal">Política de privacidade</a>
+                                </small>
+                            </div>
+
+                            <!-- Resumo do Cadastro -->
+                            <div class="alert alert-success border-0 mb-4">
+                                <h6 class="mb-2">
+                                    <i class="bi bi-check-circle"></i> Quase pronto!
+                                </h6>
+                                <p class="mb-0 small">
+                                    Ao finalizar, sua conta será criada e você receberá 100 pontos Galaxy como bônus de boas-vindas!
+                                </p>
+                            </div>
+
+                            <!-- Botões -->
+                            <div class="d-flex justify-content-between">
+                                <a href="{% url 'usuarios:registro_etapa2' %}" class="btn btn-outline-secondary">
+                                    <i class="bi bi-arrow-left"></i> Etapa Anterior
+                                </a>
+                                <button type="submit" class="btn btn-galaxy btn-lg" id="btnFinalizar">
+                                    <i class="bi bi-check-circle"></i> Finalizar Cadastro
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="card-footer bg-light text-center">
+                        <small class="text-muted">
+                            <i class="bi bi-shield-check"></i> 
+                            Seus dados estão seguros e protegidos
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Termos de Uso -->
+<div class="modal fade" id="termosModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Termos de Uso</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>1. Aceitação dos Termos</strong></p>
+                <p>Ao utilizar os serviços do Galaxy Bank, você concorda com estes termos.</p>
+                
+                <p><strong>2. Serviços Oferecidos</strong></p>
+                <p>Oferecemos serviços bancários digitais incluindo conta corrente, investimentos, cartões e empréstimos.</p>
+                
+                <p><strong>3. Responsabilidades do Usuário</strong></p>
+                <p>Você é responsável por manter suas credenciais seguras e notificar sobre qualquer uso não autorizado.</p>
+                
+                <p><strong>4. Privacidade</strong></p>
+                <p>Protegemos seus dados conforme nossa Política de Privacidade.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Política de Privacidade -->
+<div class="modal fade" id="privacidadeModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Política de Privacidade</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>Coleta de Dados</strong></p>
+                <p>Coletamos apenas dados necessários para prestação de serviços bancários.</p>
+                
+                <p><strong>Uso dos Dados</strong></p>
+                <p>Utilizamos seus dados para identificação, prestação de serviços e segurança.</p>
+                
+                <p><strong>Compartilhamento</strong></p>
+                <p>Não compartilhamos seus dados com terceiros sem sua autorização.</p>
+                
+                <p><strong>Segurança</strong></p>
+                <p>Utilizamos criptografia e outras medidas para proteger seus dados.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.min-vh-100::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><polygon fill="rgba(255,255,255,0.05)" points="0,1000 1000,0 1000,1000"/></svg>');
+}
+
+.card-galaxy {
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.98);
+    border: none;
+}
+
+.form-control:focus {
+    border-color: var(--galaxy-primary);
+    box-shadow: 0 0 0 0.2rem rgba(111, 66, 193, 0.25);
+}
+
+#id_password1:valid, #id_password2:valid {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%2328a745' d='m2.3 6.73.5.55 4.4-4.8-.9-.8-3.6 3.9L.7 4.3l-.8.9 2.4 1.53z'/%3e%3c/svg%3e");
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Validação de senha em tempo real
+const password1 = document.getElementById('id_password1');
+const password2 = document.getElementById('id_password2');
+const btnFinalizar = document.getElementById('btnFinalizar');
+
+function validatePasswords() {
+    if (password1.value.length >= 8) {
+        password1.classList.remove('is-invalid');
+        password1.classList.add('is-valid');
+    }
+    
+    if (password2.value && password1.value === password2.value) {
+        password2.classList.remove('is-invalid');
+        password2.classList.add('is-valid');
+    } else if (password2.value) {
+        password2.classList.add('is-invalid');
+        password2.classList.remove('is-valid');
+    }
+}
+
+password1.addEventListener('input', validatePasswords);
+password2.addEventListener('input', validatePasswords);
+
+// Loading no botão e formulário
+const form = document.querySelector('form');
+const originalButtonHTML = btnFinalizar.innerHTML;
+
+form.addEventListener('submit', function(e) {
+    // Verificar se o formulário é válido
+    if (form.checkValidity()) {
+        btnFinalizar.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Criando conta...';
+        btnFinalizar.disabled = true;
+    }
+});
+
+// Restaurar botão se a página carregar com erros (quando há erro no servidor)
+document.addEventListener('DOMContentLoaded', function() {
+    // Se há erros na página, restaurar o botão
+    if (document.querySelector('.alert-danger') || document.querySelector('.errorlist')) {
+        btnFinalizar.innerHTML = originalButtonHTML;
+        btnFinalizar.disabled = false;
+    }
+});
+
+// Validação em tempo real para username
+document.getElementById('id_username').addEventListener('blur', function() {
+    if (this.value.trim() !== '') {
+        this.classList.remove('is-invalid');
+        this.classList.add('is-valid');
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,173 @@
+{% extends 'usuarios/base.html' %}
+
+{% block title %}Cadastro - {{ titulo }} - Galaxy Bank{% endblock %}
+
+{% block content %}
+<div class="min-vh-100 d-flex align-items-center justify-content-center" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <div class="card card-galaxy shadow-lg">
+                    <!-- Header do Card -->
+                    <div class="card-header bg-galaxy-gradient text-white text-center">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <a href="{% url 'usuarios:login' %}" class="btn btn-sm btn-outline-light">
+                                <i class="bi bi-arrow-left"></i>
+                            </a>
+                            <div>
+                                <h4 class="mb-0">
+                                    <i class="bi bi-bank"></i> Galaxy Bank
+                                </h4>
+                                <small>Cadastro de Nova Conta</small>
+                            </div>
+                            <a href="{% url 'usuarios:registro_cancelar' %}" class="btn btn-sm btn-outline-light" onclick="return confirm('Deseja cancelar o cadastro?')">>
+                                <i class="bi bi-x"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="card-body p-4">
+                        <!-- Progress Bar -->
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <small class="text-muted">Etapa {{ etapa_atual }} de {{ total_etapas }}</small>
+                                <small class="text-muted">{% widthratio etapa_atual total_etapas 100 %}%</small>
+                            </div>
+                            <div class="progress mb-3" style="height: 6px;">
+                                <div class="progress-bar bg-galaxy-gradient" role="progressbar" 
+                                     style="width: {% widthratio etapa_atual total_etapas 100 %}%"></div>
+                            </div>
+                        </div>
+
+                        <!-- Título da Etapa -->
+                        <div class="text-center mb-4">
+                            <h3 class="fw-bold text-primary">{{ titulo }}</h3>
+                            <p class="text-muted">{{ subtitulo }}</p>
+                        </div>
+
+                        <!-- Formulário -->
+                        <form method="post" novalidate>
+                            {% csrf_token %}
+                            
+                            {% if form.errors %}
+                                <div class="alert alert-danger">
+                                    <h6><i class="bi bi-exclamation-triangle"></i> Corrija os erros abaixo:</h6>
+                                    {{ form.errors }}
+                                </div>
+                            {% endif %}
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="id_first_name" class="form-label">
+                                        <i class="bi bi-person"></i> {{ form.first_name.label }}
+                                    </label>
+                                    {{ form.first_name }}
+                                    {% if form.first_name.errors %}
+                                        <div class="text-danger small">{{ form.first_name.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="id_last_name" class="form-label">
+                                        <i class="bi bi-person"></i> {{ form.last_name.label }}
+                                    </label>
+                                    {{ form.last_name }}
+                                    {% if form.last_name.errors %}
+                                        <div class="text-danger small">{{ form.last_name.errors.0 }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="id_email" class="form-label">
+                                    <i class="bi bi-envelope"></i> {{ form.email.label }}
+                                </label>
+                                {{ form.email }}
+                                {% if form.email.errors %}
+                                    <div class="text-danger small">{{ form.email.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="id_telefone" class="form-label">
+                                    <i class="bi bi-phone"></i> {{ form.telefone.label }}
+                                </label>
+                                {{ form.telefone }}
+                                {% if form.telefone.errors %}
+                                    <div class="text-danger small">{{ form.telefone.errors.0 }}</div>
+                                {% endif %}
+                            </div>
+
+                            <!-- Botões -->
+                            <div class="d-flex justify-content-between">
+                                <a href="{% url 'usuarios:login' %}" class="btn btn-outline-secondary">
+                                    <i class="bi bi-arrow-left"></i> Voltar ao Login
+                                </a>
+                                <button type="submit" class="btn btn-galaxy btn-lg">
+                                    Próxima Etapa <i class="bi bi-arrow-right"></i>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="card-footer bg-light text-center">
+                        <small class="text-muted">
+                            <i class="bi bi-shield-check"></i> 
+                            Seus dados estão seguros e protegidos
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.min-vh-100::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><polygon fill="rgba(255,255,255,0.05)" points="0,1000 1000,0 1000,1000"/></svg>');
+}
+
+.card-galaxy {
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.98);
+    border: none;
+}
+
+.form-control:focus {
+    border-color: var(--galaxy-primary);
+    box-shadow: 0 0 0 0.2rem rgba(111, 66, 193, 0.25);
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Máscara para telefone
+document.getElementById('id_telefone').addEventListener('input', function() {
+    let value = this.value.replace(/\D/g, '');
+    if (value.length <= 11) {
+        value = value.replace(/(\d{2})(\d)/, '($1) $2');
+        value = value.replace(/(\d{4,5})(\d{4})$/, '$1-$2');
+        this.value = value;
+    }
+});
+
+// Validação em tempo real
+document.querySelectorAll('.form-control').forEach(function(input) {
+    input.addEventListener('blur', function() {
+        if (this.value.trim() !== '') {
+            this.classList.remove('is-invalid');
+            this.classList.add('is-valid');
+        }
+    });
+});
+</script>
+{% endblock %}

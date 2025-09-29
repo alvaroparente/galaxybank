@@ -1,0 +1,160 @@
+{% extends 'usuarios/base.html' %}
+
+{% block title %}Cadastro - {{ titulo }} - Galaxy Bank{% endblock %}
+
+{% block content %}
+<div class="min-vh-100 d-flex align-items-center justify-content-center" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <div class="card card-galaxy shadow-lg">
+                    <!-- Header do Card -->
+                    <div class="card-header bg-galaxy-gradient text-white text-center">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <a href="{% url 'usuarios:registro_etapa1' %}" class="btn btn-sm btn-outline-light">
+                                <i class="bi bi-arrow-left"></i>
+                            </a>
+                            <div>
+                                <h4 class="mb-0">
+                                    <i class="bi bi-bank"></i> Galaxy Bank
+                                </h4>
+                                <small>Cadastro de Nova Conta</small>
+                            </div>
+                            <a href="{% url 'usuarios:registro_cancelar' %}" class="btn btn-sm btn-outline-light" onclick="return confirm('Deseja cancelar o cadastro?')">
+                                <i class="bi bi-x"></i>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="card-body p-4">
+                        <!-- Progress Bar -->
+                        <div class="mb-4">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <small class="text-muted">Etapa {{ etapa_atual }} de {{ total_etapas }}</small>
+                                <small class="text-muted">67%</small>
+                            </div>
+                            <div class="progress mb-3" style="height: 6px;">
+                                <div class="progress-bar bg-galaxy-gradient" role="progressbar" 
+                                     style="width: 67%"></div>
+                            </div>
+                        </div>
+
+                        <!-- Título da Etapa -->
+                        <div class="text-center mb-4">
+                            <h3 class="fw-bold text-primary">{{ titulo }}</h3>
+                            <p class="text-muted">{{ subtitulo }}</p>
+                        </div>
+
+                        <!-- Formulário -->
+                        <form method="post" novalidate>
+                            {% csrf_token %}
+                            
+                            {% if form.errors %}
+                                <div class="alert alert-danger">
+                                    <h6><i class="bi bi-exclamation-triangle"></i> Corrija os erros abaixo:</h6>
+                                    {{ form.errors }}
+                                </div>
+                            {% endif %}
+
+                            <div class="mb-4">
+                                <label for="id_cpf" class="form-label">
+                                    <i class="bi bi-card-text"></i> {{ form.cpf.label }}
+                                </label>
+                                {{ form.cpf }}
+                                {% if form.cpf.errors %}
+                                    <div class="text-danger small">{{ form.cpf.errors.0 }}</div>
+                                {% endif %}
+                                <div class="form-text">
+                                    <i class="bi bi-info-circle"></i> 
+                                    Seu CPF será usado para identificação e validação da conta.
+                                </div>
+                            </div>
+
+                            <!-- Informações de Segurança -->
+                            <div class="alert alert-info border-0">
+                                <h6 class="mb-2">
+                                    <i class="bi bi-shield-lock"></i> Segurança dos seus dados
+                                </h6>
+                                <ul class="mb-0 small">
+                                    <li>Todos os dados são criptografados</li>
+                                    <li>Utilizamos protocolo SSL para transmissão</li>
+                                    <li>Seus dados nunca serão compartilhados</li>
+                                    <li>Atendemos às normas do Banco Central</li>
+                                </ul>
+                            </div>
+
+                            <!-- Botões -->
+                            <div class="d-flex justify-content-between mt-4">
+                                <a href="{% url 'usuarios:registro_etapa1' %}" class="btn btn-outline-secondary">
+                                    <i class="bi bi-arrow-left"></i> Etapa Anterior
+                                </a>
+                                <button type="submit" class="btn btn-galaxy btn-lg">
+                                    Próxima Etapa <i class="bi bi-arrow-right"></i>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="card-footer bg-light text-center">
+                        <small class="text-muted">
+                            <i class="bi bi-shield-check"></i> 
+                            Seus dados estão seguros e protegidos
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+.min-vh-100::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"><polygon fill="rgba(255,255,255,0.05)" points="0,1000 1000,0 1000,1000"/></svg>');
+}
+
+.card-galaxy {
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.98);
+    border: none;
+}
+
+.form-control:focus {
+    border-color: var(--galaxy-primary);
+    box-shadow: 0 0 0 0.2rem rgba(111, 66, 193, 0.25);
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Máscara para CPF
+document.getElementById('id_cpf').addEventListener('input', function() {
+    let value = this.value.replace(/\D/g, '');
+    if (value.length <= 11) {
+        value = value.replace(/(\d{3})(\d)/, '$1.$2');
+        value = value.replace(/(\d{3})(\d)/, '$1.$2');
+        value = value.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+        this.value = value;
+    }
+});
+
+// Validação em tempo real
+document.querySelectorAll('.form-control').forEach(function(input) {
+    input.addEventListener('blur', function() {
+        if (this.value.trim() !== '') {
+            this.classList.remove('is-invalid');
+            this.classList.add('is-valid');
+        }
+    });
+});
+</script>
+{% endblock %}
