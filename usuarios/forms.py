@@ -1,6 +1,6 @@
 from django import forms
 from django.contrib.auth import get_user_model
-from .models import Cliente
+from .models import Cliente, Gerente
 import re
 
 User = get_user_model()
@@ -148,3 +148,82 @@ class RegistroSenhaForm(forms.Form):
             raise forms.ValidationError('As senhas não coincidem.')
         
         return cleaned_data
+
+# ===== FORMULÁRIOS DE EDIÇÃO DE PERFIL =====
+
+class PerfilUsuarioForm(forms.ModelForm):
+    """Formulário para editar dados básicos do usuário"""
+    
+    class Meta:
+        model = User
+        fields = ['first_name', 'last_name', 'email', 'telefone']
+        labels = {
+            'first_name': 'Nome',
+            'last_name': 'Sobrenome',
+            'email': 'Email',
+            'telefone': 'Telefone',
+        }
+        widgets = {
+            'first_name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Digite seu nome'
+            }),
+            'last_name': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'Digite seu sobrenome'
+            }),
+            'email': forms.EmailInput(attrs={
+                'class': 'form-control',
+                'placeholder': 'seuemail@exemplo.com'
+            }),
+            'telefone': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': '(11) 99999-9999'
+            }),
+        }
+    
+    def clean_email(self):
+        email = self.cleaned_data['email']
+        # Verificar se o email já existe para outro usuário
+        if User.objects.filter(email=email).exclude(pk=self.instance.pk).exists():
+            raise forms.ValidationError('Este email já está cadastrado por outro usuário.')
+        return email
+
+class PerfilClienteForm(forms.ModelForm):
+    """Formulário para editar dados específicos do cliente"""
+    
+    class Meta:
+        model = Cliente
+        fields = ['cpf']
+        labels = {
+            'cpf': 'CPF',
+        }
+        widgets = {
+            'cpf': forms.TextInput(attrs={
+                'class': 'form-control',
+                'placeholder': '00000000000',
+                'readonly': True,  # CPF não deve ser editável após cadastro
+            }),
+        }
+
+class PerfilGerenteForm(forms.ModelForm):
+    """Formulário para editar dados específicos do gerente"""
+    
+    class Meta:
+        model = Gerente
+        fields = ['codigo_gerente', 'data_admissao']
+        labels = {
+            'codigo_gerente': 'Código do Gerente',
+            'data_admissao': 'Data de Admissão',
+        }
+        widgets = {
+            'codigo_gerente': forms.TextInput(attrs={
+                'class': 'form-control',
+                'readonly': True,  # Código do gerente não deve ser editável
+            }),
+            'data_admissao': forms.DateInput(attrs={
+                'class': 'form-control',
+                'type': 'date',
+                'readonly': True,  # Data de admissão não deve ser editável
+            }),
+        }

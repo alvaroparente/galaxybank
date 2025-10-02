@@ -16,5 +16,9 @@ urlpatterns = [
     path('registro/etapa3/', views.registro_etapa3, name='registro_etapa3'),
     path('registro/cancelar/', views.registro_cancelar, name='registro_cancelar'),
     
+    # URLs de perfil
+    path('perfil/', views.perfil_view, name='perfil'),
+    path('perfil/editar/', views.perfil_editar, name='perfil_editar'),
+    
     path('', views.home_redirect, name='home_redirect'),
 ]

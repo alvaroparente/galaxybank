@@ -211,3 +211,77 @@ def registro_cancelar(request):
     
     messages.info(request, 'Cadastro cancelado.')
     return redirect('usuarios:login')
+
+# ===== VIEWS DE PERFIL =====
+
+@login_required
+def perfil_view(request):
+    """View para exibir o perfil do usuário"""
+    try:
+        if request.user.tipo_usuario == 'cliente':
+            cliente = Cliente.objects.get(usuario=request.user)
+            context = {
+                'usuario': request.user,
+                'perfil_especifico': cliente,
+                'tipo_usuario': 'cliente',
+            }
+        elif request.user.tipo_usuario == 'gerente':
+            gerente = Gerente.objects.get(usuario=request.user)
+            context = {
+                'usuario': request.user,
+                'perfil_especifico': gerente,
+                'tipo_usuario': 'gerente',
+            }
+        else:
+            messages.error(request, 'Tipo de usuário não reconhecido.')
+            return redirect('usuarios:login')
+            
+        return render(request, 'usuarios/perfil.html', context)
+    except (Cliente.DoesNotExist, Gerente.DoesNotExist):
+        messages.error(request, 'Perfil não encontrado.')
+        return redirect('usuarios:login')
+
+@login_required
+@csrf_protect
+def perfil_editar(request):
+    """View para editar o perfil do usuário"""
+    from .forms import PerfilUsuarioForm, PerfilClienteForm, PerfilGerenteForm
+    
+    try:
+        if request.user.tipo_usuario == 'cliente':
+            cliente = Cliente.objects.get(usuario=request.user)
+            perfil_especifico = cliente
+            PerfilEspecificoForm = PerfilClienteForm
+        elif request.user.tipo_usuario == 'gerente':
+            gerente = Gerente.objects.get(usuario=request.user)
+            perfil_especifico = gerente
+            PerfilEspecificoForm = PerfilGerenteForm
+        else:
+            messages.error(request, 'Tipo de usuário não reconhecido.')
+            return redirect('usuarios:login')
+    except (Cliente.DoesNotExist, Gerente.DoesNotExist):
+        messages.error(request, 'Perfil não encontrado.')
+        return redirect('usuarios:login')
+    
+    if request.method == 'POST':
+        form_usuario = PerfilUsuarioForm(request.POST, instance=request.user)
+        form_especifico = PerfilEspecificoForm(request.POST, instance=perfil_especifico)
+        
+        if form_usuario.is_valid() and form_especifico.is_valid():
+            form_usuario.save()
+            form_especifico.save()
+            messages.success(request, 'Perfil atualizado com sucesso!')
+            return redirect('usuarios:perfil')
+    else:
+        form_usuario = PerfilUsuarioForm(instance=request.user)
+        form_especifico = PerfilEspecificoForm(instance=perfil_especifico)
+    
+    context = {
+        'form_usuario': form_usuario,
+        'form_especifico': form_especifico,
+        'usuario': request.user,
+        'perfil_especifico': perfil_especifico,
+        'tipo_usuario': request.user.tipo_usuario,
+    }
+    
+    return render(request, 'usuarios/perfil_editar.html', context)
