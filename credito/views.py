@@ -230,10 +230,21 @@ def processar_solicitacao(request, solicitacao_id):
         observacoes = request.POST.get('observacoes', '')
         valor_aprovado = request.POST.get('valor_aprovado', '0')
         
+        # Debug logging
+        print(f"DEBUG: acao={acao}, valor_aprovado={valor_aprovado}, observacoes={observacoes}")
+        
         with transaction.atomic():
             if acao == 'aprovar':
+                print(f"DEBUG: Entering approval block")
                 try:
-                    valor_aprovado = Decimal(valor_aprovado)
+                    # Se não foi fornecido valor, usar o valor solicitado
+                    if not valor_aprovado or valor_aprovado == '0':
+                        valor_aprovado = solicitacao.valor_solicitado
+                    else:
+                        # Handle Brazilian decimal format (comma as decimal separator)
+                        valor_aprovado = valor_aprovado.replace(',', '.')
+                        valor_aprovado = Decimal(valor_aprovado)
+                    
                     if valor_aprovado <= 0:
                         raise ValueError("Valor deve ser maior que zero")
                     
@@ -252,22 +263,25 @@ def processar_solicitacao(request, solicitacao_id):
                     cliente.save()
                     
                     # Registrar no histórico
+                    saldo_anterior = cliente.limite_credito if cliente.limite_credito_aprovado else Decimal('0')
                     HistoricoCredito.objects.create(
                         cliente=cliente,
                         tipo_operacao='ajuste',
                         valor=valor_aprovado,
-                        saldo_anterior=Decimal('0'),
+                        saldo_anterior=saldo_anterior,
                         saldo_posterior=valor_aprovado,
                         descricao=f'Limite aprovado pelo gerente {gerente.usuario.first_name}'
                     )
                     
                     messages.success(request, f'Solicitação aprovada com limite de R$ {valor_aprovado}!')
+                    print(f"DEBUG: Successfully approved credit request for {valor_aprovado}")
                     
-                except (ValueError, TypeError):
-                    messages.error(request, 'Valor aprovado inválido.')
+                except (ValueError, TypeError) as e:
+                    print(f"DEBUG: Error converting valor_aprovado: {e}")
+                    messages.error(request, f'Valor aprovado inválido: {str(e)}')
                     return redirect('credito:detalhes_solicitacao', solicitacao_id=solicitacao_id)
                 
-            elif acao == 'reprovar':
+            elif acao == 'rejeitar':
                 # Atualizar solicitação
                 solicitacao.status = 'reprovada'
                 solicitacao.gerente_responsavel = gerente

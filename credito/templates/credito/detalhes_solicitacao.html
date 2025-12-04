@@ -1,0 +1,466 @@
+{% extends "usuarios/base.html" %}
+
+{% block title %}Detalhes da Solicitação - Galaxy Bank{% endblock %}
+
+{% block content %}
+<div class="container-fluid h-100">
+    <div class="row h-100">
+        <!-- Sidebar Gerente -->
+        <div class="col-md-3 col-lg-2 sidebar bg-dark">
+            <div class="position-sticky pt-3">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'usuarios:dashboard_gerente' %}">
+                            <i class="bi bi-speedometer2"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'credito:avaliar_solicitacoes' %}">
+                            <i class="bi bi-clipboard-check"></i> Avaliar Crédito
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'credito:solicitacoes_avaliadas' %}">
+                            <i class="bi bi-clock-history"></i> Histórico
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Main content -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <div class="pt-3 pb-2 mb-3">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{% url 'credito:avaliar_solicitacoes' %}">Avaliar Solicitações</a></li>
+                        <li class="breadcrumb-item active">Solicitação #{{ solicitacao.id }}</li>
+                    </ol>
+                </nav>
+            </div>
+
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pb-2 mb-3 border-bottom">
+                <h1 class="h2">
+                    <i class="bi bi-file-text"></i> Detalhes da Solicitação #{{ solicitacao.id }}
+                </h1>
+                <div class="btn-toolbar mb-2 mb-md-0">
+                    {% if solicitacao.status == 'pendente' %}
+                    <button class="btn btn-success me-2" data-bs-toggle="modal" data-bs-target="#aprovarModal">
+                        <i class="bi bi-check-circle"></i> Aprovar
+                    </button>
+                    <button class="btn btn-danger me-2" data-bs-toggle="modal" data-bs-target="#rejeitarModal">
+                        <i class="bi bi-x-circle"></i> Rejeitar
+                    </button>
+                    {% endif %}
+                    <a href="{% url 'credito:avaliar_solicitacoes' %}" class="btn btn-outline-secondary">
+                        <i class="bi bi-arrow-left"></i> Voltar
+                    </a>
+                </div>
+            </div>
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <div class="row">
+                <!-- Informações da Solicitação -->
+                <div class="col-lg-8 mb-4">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Informações da Solicitação</h5>
+                            <div>
+                                {% if solicitacao.status == 'pendente' %}
+                                    <span class="badge bg-warning fs-6">Pendente</span>
+                                {% elif solicitacao.status == 'aprovada' %}
+                                    <span class="badge bg-success fs-6">Aprovada</span>
+                                {% elif solicitacao.status == 'reprovada' %}
+                                    <span class="badge bg-danger fs-6">Reprovada</span>
+                                {% elif solicitacao.status == 'cancelada' %}
+                                    <span class="badge bg-secondary fs-6">Cancelada</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <table class="table table-borderless">
+                                        <tr>
+                                            <td><strong>Data da Solicitação:</strong></td>
+                                            <td>{{ solicitacao.data_solicitacao|date:"d/m/Y H:i" }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Valor Solicitado:</strong></td>
+                                            <td><strong class="text-primary">R$ {{ solicitacao.valor_solicitado|floatformat:2 }}</strong></td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Renda Mensal:</strong></td>
+                                            <td>R$ {{ solicitacao.renda_mensal|floatformat:2 }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Profissão:</strong></td>
+                                            <td>{{ solicitacao.profissao }}</td>
+                                        </tr>
+                                        {% if solicitacao.valor_aprovado %}
+                                        <tr>
+                                            <td><strong>Valor Aprovado:</strong></td>
+                                            <td><strong class="text-success">R$ {{ solicitacao.valor_aprovado|floatformat:2 }}</strong></td>
+                                        </tr>
+                                        {% endif %}
+                                    </table>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6>Justificativa</h6>
+                                    <p class="text-muted">{{ solicitacao.justificativa }}</p>
+                                    
+                                    {% if solicitacao.status != 'pendente' %}
+                                    <h6>Avaliação do Gerente</h6>
+                                    {% if solicitacao.gerente_responsavel %}
+                                    <p><strong>Avaliado por:</strong> {{ solicitacao.gerente_responsavel.usuario.get_full_name }}</p>
+                                    {% endif %}
+                                    {% if solicitacao.data_avaliacao %}
+                                    <p><strong>Data da Avaliação:</strong> {{ solicitacao.data_avaliacao|date:"d/m/Y H:i" }}</p>
+                                    {% endif %}
+                                    {% if solicitacao.observacoes_gerente %}
+                                    <p><strong>Observações:</strong></p>
+                                    <p class="text-muted">{{ solicitacao.observacoes_gerente }}</p>
+                                    {% endif %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Informações do Cliente -->
+                    <div class="card mt-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">Dados do Cliente</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <table class="table table-borderless">
+                                        <tr>
+                                            <td><strong>Nome Completo:</strong></td>
+                                            <td>{{ solicitacao.cliente.usuario.get_full_name }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Email:</strong></td>
+                                            <td>{{ solicitacao.cliente.usuario.email }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Data de Cadastro:</strong></td>
+                                            <td>{{ solicitacao.cliente.usuario.date_joined|date:"d/m/Y" }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Status da Conta:</strong></td>
+                                            <td>
+                                                {% if solicitacao.cliente.usuario.is_active %}
+                                                    <span class="badge bg-success">Ativa</span>
+                                                {% else %}
+                                                    <span class="badge bg-danger">Inativa</span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                                <div class="col-md-6">
+                                    <table class="table table-borderless">
+                                        <tr>
+                                            <td><strong>Saldo Atual:</strong></td>
+                                            <td>R$ {{ solicitacao.cliente.saldo|floatformat:2 }}</td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Limite de Crédito Atual:</strong></td>
+                                            <td>
+                                                {% if solicitacao.cliente.limite_credito_aprovado %}
+                                                    R$ {{ solicitacao.cliente.limite_credito|floatformat:2 }}
+                                                {% else %}
+                                                    <span class="text-muted">Nenhum</span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td><strong>Limite Aprovado:</strong></td>
+                                            <td>
+                                                {% if solicitacao.cliente.limite_credito_aprovado %}
+                                                    <span class="badge bg-success">Sim</span>
+                                                {% else %}
+                                                    <span class="badge bg-warning">Não</span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Histórico de Solicitações -->
+                    <div class="card mt-4">
+                        <div class="card-header">
+                            <h5 class="mb-0">Histórico de Solicitações do Cliente</h5>
+                        </div>
+                        <div class="card-body">
+                            {% with historico=solicitacao.cliente.solicitacoes_credito.all %}
+                            {% if historico.count > 1 %}
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Data</th>
+                                            <th>Valor</th>
+                                            <th>Status</th>
+                                            <th>Gerente</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for hist in historico %}
+                                        {% if hist.id != solicitacao.id %}
+                                        <tr>
+                                            <td>{{ hist.data_solicitacao|date:"d/m/Y" }}</td>
+                                            <td>R$ {{ hist.valor_solicitado|floatformat:2 }}</td>
+                                            <td>
+                                                {% if hist.status == 'pendente' %}
+                                                    <span class="badge bg-warning">Pendente</span>
+                                                {% elif hist.status == 'aprovada' %}
+                                                    <span class="badge bg-success">Aprovada</span>
+                                                {% elif hist.status == 'reprovada' %}
+                                                    <span class="badge bg-danger">Reprovada</span>
+                                                {% else %}
+                                                    <span class="badge bg-secondary">Cancelada</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if hist.gerente_responsavel %}
+                                                    {{ hist.gerente_responsavel.usuario.get_full_name }}
+                                                {% else %}
+                                                    -
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                        {% endif %}
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {% else %}
+                            <p class="text-muted">Esta é a primeira solicitação do cliente.</p>
+                            {% endif %}
+                            {% endwith %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sidebar de Análise -->
+                <div class="col-lg-4 mb-4">
+                    <!-- Análise de Risco -->
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Análise de Risco</h5>
+                        </div>
+                        <div class="card-body">
+                            {% if solicitacao.renda_mensal and solicitacao.renda_mensal > 0 %}
+                                {% with percentual=solicitacao.valor_solicitado|floatformat:0|add:0 %}
+                                    {% with renda_int=solicitacao.renda_mensal|floatformat:0|add:0 %}
+                                        <p><strong>Comprometimento de Renda:</strong></p>
+                                        <p class="text-muted">Aproximadamente {{ percentual|floatformat:0 }} / {{ renda_int|floatformat:0 }}</p>
+                                        {% if solicitacao.valor_solicitado <= 5000 %}
+                                            <span class="badge bg-success">Baixo Risco</span>
+                                            <p class="small text-muted mt-2">Valor dentro do limite considerado seguro.</p>
+                                        {% elif solicitacao.valor_solicitado <= 15000 %}
+                                            <span class="badge bg-warning">Médio Risco</span>
+                                            <p class="small text-muted mt-2">Valor requer análise cuidadosa da capacidade de pagamento.</p>
+                                        {% else %}
+                                            <span class="badge bg-danger">Alto Risco</span>
+                                            <p class="small text-muted mt-2">Valor alto requer análise rigorosa e garantias adicionais.</p>
+                                        {% endif %}
+                                    {% endwith %}
+                                {% endwith %}
+                            {% else %}
+                                <span class="badge bg-secondary">Análise Manual Necessária</span>
+                                <p class="small text-muted mt-2">Informações insuficientes para cálculo automático.</p>
+                            {% endif %}
+                            
+                            <hr>
+                            
+                            <h6>Recomendações:</h6>
+                            <ul class="small">
+                                {% if solicitacao.cliente.limite_credito_aprovado %}
+                                <li class="text-success">Cliente já possui limite aprovado</li>
+                                {% else %}
+                                <li class="text-warning">Primeira solicitação de crédito</li>
+                                {% endif %}
+                                {% if solicitacao.cliente.saldo > 1000 %}
+                                <li class="text-success">Possui saldo significativo na conta</li>
+                                {% endif %}
+                                {% if solicitacao.valor_solicitado > 10000 %}
+                                <li class="text-warning">Valor alto - considerar aprovação parcial</li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Ações Rápidas -->
+                    {% if solicitacao.status == 'pendente' %}
+                    <div class="card mt-3">
+                        <div class="card-header">
+                            <h5 class="mb-0">Ações Rápidas</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-grid gap-2">
+                                <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#aprovarModal">
+                                    <i class="bi bi-check-circle"></i> Aprovar Solicitação
+                                </button>
+                                <button class="btn btn-outline-success" data-bs-toggle="modal" data-bs-target="#aprovarParcialModal">
+                                    <i class="bi bi-check-circle-fill"></i> Aprovar Parcialmente
+                                </button>
+                                <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#rejeitarModal">
+                                    <i class="bi bi-x-circle"></i> Rejeitar Solicitação
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+{% if solicitacao.status == 'pendente' %}
+<!-- Modal Aprovar -->
+<div class="modal fade" id="aprovarModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" action="{% url 'credito:processar_solicitacao' solicitacao.id %}">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title text-success">
+                        <i class="bi bi-check-circle"></i> Aprovar Solicitação
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="acao" value="aprovar">
+                    <input type="hidden" name="valor_aprovado" value="{{ solicitacao.valor_solicitado }}">
+                    
+                    <p><strong>Cliente:</strong> {{ solicitacao.cliente.usuario.get_full_name }}</p>
+                    <p><strong>Valor:</strong> R$ {{ solicitacao.valor_solicitado|floatformat:2 }}</p>
+                    
+                    <div class="mb-3">
+                        <label for="observacoes_aprovar" class="form-label">Observações (opcional):</label>
+                        <textarea class="form-control" id="observacoes_aprovar" name="observacoes" rows="3" placeholder="Comentários sobre a aprovação..."></textarea>
+                    </div>
+                    
+                    <div class="alert alert-success">
+                        <i class="bi bi-info-circle"></i>
+                        O limite de crédito será automaticamente adicionado à conta do cliente.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-check-circle"></i> Confirmar Aprovação
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Aprovar Parcialmente -->
+<div class="modal fade" id="aprovarParcialModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" action="{% url 'credito:processar_solicitacao' solicitacao.id %}">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title text-success">
+                        <i class="bi bi-check-circle-fill"></i> Aprovação Parcial
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="acao" value="aprovar">
+                    
+                    <p><strong>Cliente:</strong> {{ solicitacao.cliente.usuario.get_full_name }}</p>
+                    <p><strong>Valor Solicitado:</strong> R$ {{ solicitacao.valor_solicitado|floatformat:2 }}</p>
+                    
+                    <div class="mb-3">
+                        <label for="valor_aprovado_parcial" class="form-label">Valor a Aprovar:</label>
+                        <div class="input-group">
+                            <span class="input-group-text">R$</span>
+                            <input type="number" class="form-control" id="valor_aprovado_parcial" name="valor_aprovado" 
+                                   min="100" max="{{ solicitacao.valor_solicitado }}" step="0.01" 
+                                   value="{{ solicitacao.valor_solicitado }}" required>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="observacoes_parcial" class="form-label">Justificativa para aprovação parcial:</label>
+                        <textarea class="form-control" id="observacoes_parcial" name="observacoes" rows="3" 
+                                  placeholder="Explique o motivo da aprovação parcial..." required></textarea>
+                    </div>
+                    
+                    <div class="alert alert-warning">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        O cliente será notificado sobre a aprovação parcial.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-check-circle-fill"></i> Aprovar Parcialmente
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Rejeitar -->
+<div class="modal fade" id="rejeitarModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="post" action="{% url 'credito:processar_solicitacao' solicitacao.id %}">
+                {% csrf_token %}
+                <div class="modal-header">
+                    <h5 class="modal-title text-danger">
+                        <i class="bi bi-x-circle"></i> Rejeitar Solicitação
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="acao" value="rejeitar">
+                    
+                    <p><strong>Cliente:</strong> {{ solicitacao.cliente.usuario.get_full_name }}</p>
+                    <p><strong>Valor:</strong> R$ {{ solicitacao.valor_solicitado|floatformat:2 }}</p>
+                    
+                    <div class="mb-3">
+                        <label for="observacoes_rejeitar" class="form-label">Motivo da rejeição:</label>
+                        <textarea class="form-control" id="observacoes_rejeitar" name="observacoes" rows="3" 
+                                  placeholder="Explique o motivo da rejeição..." required></textarea>
+                    </div>
+                    
+                    <div class="alert alert-warning">
+                        <i class="bi bi-exclamation-triangle"></i>
+                        O cliente será notificado sobre a rejeição e poderá ver suas observações.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-x-circle"></i> Confirmar Rejeição
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

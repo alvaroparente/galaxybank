@@ -81,8 +81,8 @@
                                     {% else %}
                                         <p class="text-muted">Sem observações adicionais.</p>
                                     {% endif %}
-                                    {% if solicitacao.data_resposta %}
-                                        <small class="text-muted">Respondido em: {{ solicitacao.data_resposta|date:"d/m/Y H:i" }}</small>
+                                    {% if solicitacao.data_avaliacao %}
+                                        <small class="text-muted">Respondido em: {{ solicitacao.data_avaliacao|date:"d/m/Y H:i" }}</small>
                                     {% endif %}
                                     {% endif %}
                                 </div>
@@ -118,11 +118,11 @@
                                     </small>
                                     {% elif solicitacao.status == 'aprovado' %}
                                     <small class="text-success">
-                                        <i class="bi bi-check-circle"></i> Aprovado por {{ solicitacao.avaliado_por.get_full_name }}
+                                        <i class="bi bi-check-circle"></i> Aprovado por {{ solicitacao.gerente_responsavel.usuario.get_full_name }}
                                     </small>
                                     {% elif solicitacao.status == 'rejeitado' %}
                                     <small class="text-danger">
-                                        <i class="bi bi-x-circle"></i> Rejeitado por {{ solicitacao.avaliado_por.get_full_name }}
+                                        <i class="bi bi-x-circle"></i> Rejeitado por {{ solicitacao.gerente_responsavel.usuario.get_full_name }}
                                     </small>
                                     {% endif %}
                                 </div>
@@ -185,9 +185,9 @@
                                         
                                         {% if solicitacao.status != 'pendente' %}
                                         <h6>Avaliação do Gerente</h6>
-                                        <p><strong>Avaliado por:</strong> {{ solicitacao.avaliado_por.get_full_name }}</p>
-                                        {% if solicitacao.data_resposta %}
-                                        <p><strong>Data da Resposta:</strong> {{ solicitacao.data_resposta|date:"d/m/Y H:i:s" }}</p>
+                                        <p><strong>Avaliado por:</strong> {{ solicitacao.gerente_responsavel.usuario.get_full_name }}</p>
+                                        {% if solicitacao.data_avaliacao %}
+                                        <p><strong>Data da Resposta:</strong> {{ solicitacao.data_avaliacao|date:"d/m/Y H:i:s" }}</p>
                                         {% endif %}
                                         {% if solicitacao.observacoes_gerente %}
                                         <p><strong>Observações:</strong></p>

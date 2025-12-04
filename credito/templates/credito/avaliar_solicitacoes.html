@@ -20,7 +20,7 @@
                         </a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'credito:historico_avaliacoes' %}">
+                        <a class="nav-link" href="{% url 'credito:solicitacoes_avaliadas' %}">
                             <i class="bi bi-clock-history"></i> Histórico
                         </a>
                     </li>
@@ -165,12 +165,12 @@
                                 <div class="col-12">
                                     <div class="alert alert-{% if solicitacao.status == 'aprovado' %}success{% else %}danger{% endif %}">
                                         <h6><i class="bi bi-{% if solicitacao.status == 'aprovado' %}check{% else %}x{% endif %}-circle"></i> 
-                                            Avaliado por {{ solicitacao.avaliado_por.get_full_name }}
+                                            Avaliado por {{ solicitacao.gerente_responsavel.usuario.get_full_name }}
                                         </h6>
                                         {% if solicitacao.observacoes_gerente %}
                                         <p class="mb-0"><strong>Observações:</strong> {{ solicitacao.observacoes_gerente }}</p>
                                         {% endif %}
-                                        <small>{{ solicitacao.data_resposta|date:"d/m/Y H:i:s" }}</small>
+                                        <small>{{ solicitacao.data_avaliacao|date:"d/m/Y H:i:s" }}</small>
                                     </div>
                                 </div>
                             </div>
@@ -206,7 +206,7 @@
                 <div class="modal fade" id="aprovarModal{{ solicitacao.id }}" tabindex="-1">
                     <div class="modal-dialog">
                         <div class="modal-content">
-                            <form method="post" action="{% url 'credito:avaliar_solicitacao' solicitacao.id %}">
+                            <form method="post" action="{% url 'credito:processar_solicitacao' solicitacao.id %}">
                                 {% csrf_token %}
                                 <div class="modal-header">
                                     <h5 class="modal-title text-success">
@@ -216,6 +216,7 @@
                                 </div>
                                 <div class="modal-body">
                                     <input type="hidden" name="acao" value="aprovar">
+                                    <input type="hidden" name="valor_aprovado" value="{{ solicitacao.valor_solicitado }}">
                                     <p><strong>Cliente:</strong> {{ solicitacao.cliente.get_full_name }}</p>
                                     <p><strong>Valor:</strong> R$ {{ solicitacao.valor_solicitado|floatformat:2 }}</p>
                                     
@@ -244,7 +245,7 @@
                 <div class="modal fade" id="rejeitarModal{{ solicitacao.id }}" tabindex="-1">
                     <div class="modal-dialog">
                         <div class="modal-content">
-                            <form method="post" action="{% url 'credito:avaliar_solicitacao' solicitacao.id %}">
+                            <form method="post" action="{% url 'credito:processar_solicitacao' solicitacao.id %}">
                                 {% csrf_token %}
                                 <div class="modal-header">
                                     <h5 class="modal-title text-danger">
