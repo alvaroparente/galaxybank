@@ -33,6 +33,9 @@ class Cliente(models.Model):
         validators=[RegexValidator(r'^\d{11}$', message='CPF deve conter 11 dígitos')]
     )
     score_pontos = models.IntegerField(default=0)
+    saldo = models.DecimalField(max_digits=10, decimal_places=2, default=1000.00)
+    limite_credito = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    limite_credito_aprovado = models.BooleanField(default=False)
     data_cadastro = models.DateTimeField(auto_now_add=True)
     
     class Meta:

@@ -1,0 +1,321 @@
+{% extends "usuarios/base.html" %}
+
+{% block title %}Minhas Faturas - Galaxy Bank{% endblock %}
+
+{% block content %}
+<div class="container-fluid h-100">
+    <div class="row h-100">
+        <!-- Sidebar -->
+        <div class="col-md-3 col-lg-2 sidebar bg-dark">
+            <div class="position-sticky pt-3">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'usuarios:dashboard_cliente' %}">
+                            <i class="bi bi-speedometer2"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{% url 'faturas:minhas_faturas' %}">
+                            <i class="bi bi-receipt"></i> Minhas Faturas
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Main content -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2">
+                    <i class="bi bi-receipt"></i> Minhas Faturas
+                </h1>
+                <div class="btn-toolbar mb-2 mb-md-0">
+                    <div class="btn-group me-2">
+                        <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
+                            Filtrar Status
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="?status=">Todas</a></li>
+                            <li><a class="dropdown-item" href="?status=pendente">Pendentes</a></li>
+                            <li><a class="dropdown-item" href="?status=paga">Pagas</a></li>
+                            <li><a class="dropdown-item" href="?status=vencida">Vencidas</a></li>
+                            <li><a class="dropdown-item" href="?status=cancelada">Canceladas</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Resumo Financeiro -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="card text-center border-warning">
+                        <div class="card-body">
+                            <h5 class="card-title text-warning">R$ {{ total_pendente|floatformat:2 }}</h5>
+                            <p class="card-text">Total em Aberto</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center border-danger">
+                        <div class="card-body">
+                            <h5 class="card-title text-danger">R$ {{ total_vencido|floatformat:2 }}</h5>
+                            <p class="card-text">Total Vencido</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center border-success">
+                        <div class="card-body">
+                            <h5 class="card-title text-success">R$ {{ total_pago|floatformat:2 }}</h5>
+                            <p class="card-text">Total Pago</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center border-info">
+                        <div class="card-body">
+                            <h5 class="card-title text-info">{{ faturas_count }}</h5>
+                            <p class="card-text">Total de Faturas</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {% if faturas %}
+            <!-- Lista de Faturas -->
+            <div class="row">
+                {% for fatura in faturas %}
+                <div class="col-12 mb-4">
+                    <div class="card {% if fatura.status == 'vencida' %}border-danger{% elif fatura.status == 'pendente' %}border-warning{% elif fatura.status == 'paga' %}border-success{% endif %}">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>Fatura #{{ fatura.id }}</strong>
+                                <span class="text-muted ms-2">{{ fatura.data_emissao|date:"d/m/Y" }}</span>
+                            </div>
+                            <div>
+                                {% if fatura.status == 'pendente' %}
+                                    {% if fatura.esta_vencida %}
+                                        <span class="badge bg-danger">Vencida</span>
+                                    {% else %}
+                                        <span class="badge bg-warning">Pendente</span>
+                                    {% endif %}
+                                {% elif fatura.status == 'paga' %}
+                                    <span class="badge bg-success">Paga</span>
+                                {% elif fatura.status == 'cancelada' %}
+                                    <span class="badge bg-secondary">Cancelada</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6>Informações da Fatura</h6>
+                                    <p><strong>Valor Total:</strong> R$ {{ fatura.valor_total|floatformat:2 }}</p>
+                                    <p><strong>Número de Parcelas:</strong> {{ fatura.numero_parcelas }}x</p>
+                                    <p><strong>Data de Vencimento:</strong> {{ fatura.data_vencimento|date:"d/m/Y" }}</p>
+                                    {% if fatura.compra %}
+                                    <p><strong>Referente à Compra:</strong> #{{ fatura.compra.id }}</p>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6">
+                                    <h6>Status dos Pagamentos</h6>
+                                    <div class="progress mb-3">
+                                        <div class="progress-bar {% if fatura.percentual_pago == 100 %}bg-success{% elif fatura.percentual_pago > 0 %}bg-warning{% else %}bg-danger{% endif %}" 
+                                             style="width: {{ fatura.percentual_pago }}%">
+                                            {{ fatura.percentual_pago|floatformat:1 }}%
+                                        </div>
+                                    </div>
+                                    <p><strong>Pago:</strong> R$ {{ fatura.valor_pago|floatformat:2 }}</p>
+                                    <p><strong>Restante:</strong> R$ {{ fatura.saldo_devedor|floatformat:2 }}</p>
+                                </div>
+                            </div>
+                            
+                            <!-- Parcelas -->
+                            {% if fatura.pagamentos.exists %}
+                            <div class="row mt-3">
+                                <div class="col-12">
+                                    <h6>Parcelas</h6>
+                                    <div class="table-responsive">
+                                        <table class="table table-sm">
+                                            <thead>
+                                                <tr>
+                                                    <th>Parcela</th>
+                                                    <th>Valor</th>
+                                                    <th>Vencimento</th>
+                                                    <th>Status</th>
+                                                    <th>Data Pagamento</th>
+                                                    <th>Ações</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for pagamento in fatura.pagamentos.all|slice:":5" %}
+                                                <tr>
+                                                    <td>{{ pagamento.numero_parcela }}/{{ fatura.numero_parcelas }}</td>
+                                                    <td>R$ {{ pagamento.valor_parcela|floatformat:2 }}</td>
+                                                    <td>{{ pagamento.data_vencimento|date:"d/m/Y" }}</td>
+                                                    <td>
+                                                        {% if pagamento.pago %}
+                                                            <span class="badge bg-success">Paga</span>
+                                                        {% elif pagamento.esta_vencida %}
+                                                            <span class="badge bg-danger">Vencida</span>
+                                                        {% else %}
+                                                            <span class="badge bg-warning">Pendente</span>
+                                                        {% endif %}
+                                                    </td>
+                                                    <td>
+                                                        {% if pagamento.data_pagamento %}
+                                                            {{ pagamento.data_pagamento|date:"d/m/Y" }}
+                                                        {% else %}
+                                                            -
+                                                        {% endif %}
+                                                    </td>
+                                                    <td>
+                                                        {% if not pagamento.pago %}
+                                                        <button class="btn btn-sm btn-success" onclick="pagarParcela({{ pagamento.id }})">
+                                                            <i class="bi bi-credit-card"></i>
+                                                        </button>
+                                                        {% endif %}
+                                                    </td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    {% if fatura.pagamentos.count > 5 %}
+                                    <p class="text-muted small">E mais {{ fatura.pagamentos.count|add:"-5" }} parcela{{ fatura.pagamentos.count|add:"-5"|pluralize }}...</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="card-footer bg-transparent">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    {% if fatura.esta_vencida %}
+                                    <small class="text-danger">
+                                        <i class="bi bi-exclamation-triangle"></i> 
+                                        Vencida há {{ fatura.dias_em_atraso }} dia{{ fatura.dias_em_atraso|pluralize }}
+                                    </small>
+                                    {% elif fatura.status == 'pendente' %}
+                                    <small class="text-warning">
+                                        <i class="bi bi-clock"></i> 
+                                        Vence em {{ fatura.dias_para_vencimento }} dia{{ fatura.dias_para_vencimento|pluralize }}
+                                    </small>
+                                    {% elif fatura.status == 'paga' %}
+                                    <small class="text-success">
+                                        <i class="bi bi-check-circle"></i> Fatura quitada
+                                    </small>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    {% if fatura.status == 'pendente' %}
+                                    <button class="btn btn-sm btn-success me-2" onclick="pagarFaturaCompleta({{ fatura.id }})">
+                                        <i class="bi bi-credit-card"></i> Pagar Tudo
+                                    </button>
+                                    {% endif %}
+                                    <a href="{% url 'faturas:detalhes_fatura' fatura.id %}" class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-eye"></i> Ver Detalhes
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Paginação -->
+            {% if is_paginated %}
+            <nav aria-label="Paginação">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page=1{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}">Primeira</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}">Anterior</a>
+                    </li>
+                    {% endif %}
+                    
+                    <li class="page-item active">
+                        <span class="page-link">{{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+                    </li>
+                    
+                    {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}">Próxima</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}">Última</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+
+            {% else %}
+            <!-- Nenhuma Fatura -->
+            <div class="text-center py-5">
+                <i class="bi bi-receipt" style="font-size: 4rem; color: #ccc;"></i>
+                <h3 class="mt-3">Você não possui faturas</h3>
+                <p class="text-muted">Suas faturas aparecerão aqui quando você fizer compras parceladas.</p>
+                <a href="{% url 'loja:produtos' %}" class="btn btn-primary btn-lg">
+                    <i class="bi bi-shop"></i> Ir às Compras
+                </a>
+            </div>
+            {% endif %}
+        </main>
+    </div>
+</div>
+
+<script>
+function pagarParcela(pagamentoId) {
+    if (confirm('Deseja pagar esta parcela usando seu saldo?')) {
+        fetch(`/faturas/pagar-parcela/${pagamentoId}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Erro ao processar pagamento: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+            alert('Erro ao processar pagamento.');
+        });
+    }
+}
+
+function pagarFaturaCompleta(faturaId) {
+    if (confirm('Deseja quitar toda a fatura usando seu saldo?')) {
+        fetch(`/faturas/pagar-fatura-completa/${faturaId}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                'Content-Type': 'application/json',
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Erro ao processar pagamento: ' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Erro:', error);
+            alert('Erro ao processar pagamento.');
+        });
+    }
+}
+</script>
+{% endblock %}

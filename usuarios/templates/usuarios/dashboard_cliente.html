@@ -15,33 +15,38 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <i class="bi bi-credit-card"></i> Minhas Contas
+                    <a class="nav-link" href="{% url 'loja:home' %}">
+                        <i class="bi bi-shop"></i> Loja
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <i class="bi bi-arrow-left-right"></i> Transferências
+                    <a class="nav-link" href="{% url 'loja:compras' %}">
+                        <i class="bi bi-bag-check"></i> Minhas Compras
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <i class="bi bi-graph-up-arrow"></i> Investimentos
+                    <a class="nav-link" href="{% url 'credito:solicitar' %}">
+                        <i class="bi bi-credit-card"></i> Solicitar Crédito
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <i class="bi bi-cash-coin"></i> Empréstimos
+                    <a class="nav-link" href="{% url 'credito:minhas_solicitacoes' %}">
+                        <i class="bi bi-file-text"></i> Solicitações
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <i class="bi bi-shop"></i> Shopping
+                    <a class="nav-link" href="{% url 'faturas:minhas_faturas' %}">
+                        <i class="bi bi-receipt"></i> Minhas Faturas
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <i class="bi bi-chat-dots"></i> Suporte
+                    <a class="nav-link" href="{% url 'faturas:fatura_atual' %}">
+                        <i class="bi bi-calendar-check"></i> Fatura Atual
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'usuarios:perfil' %}">
+                        <i class="bi bi-person"></i> Perfil
                     </a>
                 </li>
             </ul>
@@ -69,17 +74,8 @@
                     <div class="card stats-card border-0 shadow-sm">
                         <div class="card-body text-center">
                             <i class="bi bi-wallet text-primary fs-1"></i>
-                            <h5 class="card-title mt-2">Saldo Total</h5>
-                            <h3 class="text-primary">R$ 15.720,50</h3>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3 mb-3">
-                    <div class="card stats-card border-0 shadow-sm">
-                        <div class="card-body text-center">
-                            <i class="bi bi-graph-up text-success fs-1"></i>
-                            <h5 class="card-title mt-2">Investimentos</h5>
-                            <h3 class="text-success">R$ 8.450,00</h3>
+                            <h5 class="card-title mt-2">Saldo Disponível</h5>
+                            <h3 class="text-primary">R$ {{ cliente.saldo|floatformat:2 }}</h3>
                         </div>
                     </div>
                 </div>
@@ -88,7 +84,23 @@
                         <div class="card-body text-center">
                             <i class="bi bi-credit-card text-warning fs-1"></i>
                             <h5 class="card-title mt-2">Limite Crédito</h5>
-                            <h3 class="text-warning">R$ 5.000,00</h3>
+                            {% if cliente.limite_credito_aprovado %}
+                                <h3 class="text-warning">R$ {{ cliente.limite_credito|floatformat:2 }}</h3>
+                                <small class="text-success"><i class="bi bi-check-circle"></i> Aprovado</small>
+                            {% else %}
+                                <h3 class="text-muted">R$ 0,00</h3>
+                                <small class="text-muted">Não aprovado</small>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="card stats-card border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <i class="bi bi-bag-check text-success fs-1"></i>
+                            <h5 class="card-title mt-2">Compras</h5>
+                            <h3 class="text-success">{{ cliente.compras.count }}</h3>
+                            <small class="text-muted">Total de pedidos</small>
                         </div>
                     </div>
                 </div>
@@ -111,34 +123,34 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-2 col-6 mb-3 text-center">
-                            <button class="btn btn-outline-primary btn-lg mb-2 w-100">
-                                <i class="bi bi-send"></i>
-                            </button>
-                            <small class="d-block">PIX</small>
+                            <a href="{% url 'loja:home' %}" class="btn btn-outline-primary btn-lg mb-2 w-100">
+                                <i class="bi bi-shop"></i>
+                            </a>
+                            <small class="d-block">Loja</small>
                         </div>
                         <div class="col-md-2 col-6 mb-3 text-center">
-                            <button class="btn btn-outline-success btn-lg mb-2 w-100">
-                                <i class="bi bi-arrow-down-up"></i>
-                            </button>
-                            <small class="d-block">Transferir</small>
+                            <a href="{% url 'loja:carrinho' %}" class="btn btn-outline-success btn-lg mb-2 w-100">
+                                <i class="bi bi-cart"></i>
+                            </a>
+                            <small class="d-block">Carrinho</small>
                         </div>
                         <div class="col-md-2 col-6 mb-3 text-center">
-                            <button class="btn btn-outline-warning btn-lg mb-2 w-100">
-                                <i class="bi bi-phone"></i>
-                            </button>
-                            <small class="d-block">Recarga</small>
+                            <a href="{% url 'credito:solicitar' %}" class="btn btn-outline-warning btn-lg mb-2 w-100">
+                                <i class="bi bi-credit-card"></i>
+                            </a>
+                            <small class="d-block">Solicitar Crédito</small>
                         </div>
                         <div class="col-md-2 col-6 mb-3 text-center">
-                            <button class="btn btn-outline-info btn-lg mb-2 w-100">
+                            <a href="{% url 'faturas:minhas_faturas' %}" class="btn btn-outline-info btn-lg mb-2 w-100">
                                 <i class="bi bi-receipt"></i>
-                            </button>
-                            <small class="d-block">Pagar Conta</small>
+                            </a>
+                            <small class="d-block">Faturas</small>
                         </div>
                         <div class="col-md-2 col-6 mb-3 text-center">
-                            <button class="btn btn-outline-secondary btn-lg mb-2 w-100">
-                                <i class="bi bi-graph-up-arrow"></i>
-                            </button>
-                            <small class="d-block">Investir</small>
+                            <a href="{% url 'loja:compras' %}" class="btn btn-outline-secondary btn-lg mb-2 w-100">
+                                <i class="bi bi-bag-check"></i>
+                            </a>
+                            <small class="d-block">Compras</small>
                         </div>
                         <div class="col-md-2 col-6 mb-3 text-center">
                             <button class="btn btn-outline-dark btn-lg mb-2 w-100">

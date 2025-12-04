@@ -1,0 +1,252 @@
+{% extends "usuarios/base.html" %}
+
+{% block title %}Minhas Solicitações - Galaxy Bank{% endblock %}
+
+{% block content %}
+<div class="container-fluid h-100">
+    <div class="row h-100">
+        <!-- Sidebar -->
+        <div class="col-md-3 col-lg-2 sidebar bg-dark">
+            <div class="position-sticky pt-3">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'usuarios:dashboard_cliente' %}">
+                            <i class="bi bi-speedometer2"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'credito:solicitar' %}">
+                            <i class="bi bi-credit-card"></i> Solicitar Crédito
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{% url 'credito:minhas_solicitacoes' %}">
+                            <i class="bi bi-list-check"></i> Minhas Solicitações
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Main content -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2">
+                    <i class="bi bi-list-check"></i> Minhas Solicitações de Crédito
+                </h1>
+                <div class="btn-toolbar mb-2 mb-md-0">
+                    <a href="{% url 'credito:solicitar' %}" class="btn btn-primary">
+                        <i class="bi bi-plus-circle"></i> Nova Solicitação
+                    </a>
+                </div>
+            </div>
+
+            {% if solicitacoes %}
+            <!-- Lista de Solicitações -->
+            <div class="row">
+                {% for solicitacao in solicitacoes %}
+                <div class="col-12 mb-4">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong>Solicitação #{{ solicitacao.id }}</strong>
+                                <span class="text-muted ms-2">{{ solicitacao.data_solicitacao|date:"d/m/Y H:i" }}</span>
+                            </div>
+                            <div>
+                                {% if solicitacao.status == 'pendente' %}
+                                    <span class="badge bg-warning">Pendente</span>
+                                {% elif solicitacao.status == 'aprovado' %}
+                                    <span class="badge bg-success">Aprovado</span>
+                                {% elif solicitacao.status == 'rejeitado' %}
+                                    <span class="badge bg-danger">Rejeitado</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6>Detalhes da Solicitação</h6>
+                                    <p><strong>Valor Solicitado:</strong> R$ {{ solicitacao.valor_solicitado|floatformat:2 }}</p>
+                                    <p><strong>Renda Informada:</strong> R$ {{ solicitacao.renda_mensal|floatformat:2 }}</p>
+                                    <p><strong>Profissão:</strong> {{ solicitacao.profissao }}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6>Justificativa</h6>
+                                    <p class="text-muted">{{ solicitacao.justificativa }}</p>
+                                    
+                                    {% if solicitacao.status != 'pendente' %}
+                                    <h6>Resposta do Gerente</h6>
+                                    {% if solicitacao.observacoes_gerente %}
+                                        <p class="text-muted">{{ solicitacao.observacoes_gerente }}</p>
+                                    {% else %}
+                                        <p class="text-muted">Sem observações adicionais.</p>
+                                    {% endif %}
+                                    {% if solicitacao.data_resposta %}
+                                        <small class="text-muted">Respondido em: {{ solicitacao.data_resposta|date:"d/m/Y H:i" }}</small>
+                                    {% endif %}
+                                    {% endif %}
+                                </div>
+                            </div>
+                            
+                            {% if solicitacao.status == 'aprovado' %}
+                            <div class="row mt-3">
+                                <div class="col-12">
+                                    <div class="alert alert-success">
+                                        <h6><i class="bi bi-check-circle"></i> Solicitação Aprovada!</h6>
+                                        <p class="mb-0">Seu limite de crédito de <strong>R$ {{ solicitacao.valor_solicitado|floatformat:2 }}</strong> foi aprovado e já está disponível em sua conta.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            {% elif solicitacao.status == 'rejeitado' %}
+                            <div class="row mt-3">
+                                <div class="col-12">
+                                    <div class="alert alert-danger">
+                                        <h6><i class="bi bi-x-circle"></i> Solicitação Rejeitada</h6>
+                                        <p class="mb-0">Infelizmente sua solicitação não foi aprovada. Você pode tentar novamente com um valor menor ou aguardar mais tempo antes de fazer uma nova solicitação.</p>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="card-footer bg-transparent">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    {% if solicitacao.status == 'pendente' %}
+                                    <small class="text-muted">
+                                        <i class="bi bi-clock"></i> Aguardando análise
+                                    </small>
+                                    {% elif solicitacao.status == 'aprovado' %}
+                                    <small class="text-success">
+                                        <i class="bi bi-check-circle"></i> Aprovado por {{ solicitacao.avaliado_por.get_full_name }}
+                                    </small>
+                                    {% elif solicitacao.status == 'rejeitado' %}
+                                    <small class="text-danger">
+                                        <i class="bi bi-x-circle"></i> Rejeitado por {{ solicitacao.avaliado_por.get_full_name }}
+                                    </small>
+                                    {% endif %}
+                                </div>
+                                <div>
+                                    <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#detalhesModal{{ solicitacao.id }}">
+                                        <i class="bi bi-eye"></i> Ver Detalhes
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal de Detalhes -->
+                <div class="modal fade" id="detalhesModal{{ solicitacao.id }}" tabindex="-1">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Detalhes da Solicitação #{{ solicitacao.id }}</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h6>Informações da Solicitação</h6>
+                                        <table class="table table-sm">
+                                            <tr>
+                                                <td><strong>Data da Solicitação:</strong></td>
+                                                <td>{{ solicitacao.data_solicitacao|date:"d/m/Y H:i:s" }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Valor Solicitado:</strong></td>
+                                                <td>R$ {{ solicitacao.valor_solicitado|floatformat:2 }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Renda Mensal:</strong></td>
+                                                <td>R$ {{ solicitacao.renda_mensal|floatformat:2 }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Profissão:</strong></td>
+                                                <td>{{ solicitacao.profissao }}</td>
+                                            </tr>
+                                            <tr>
+                                                <td><strong>Status:</strong></td>
+                                                <td>
+                                                    {% if solicitacao.status == 'pendente' %}
+                                                        <span class="badge bg-warning">Pendente</span>
+                                                    {% elif solicitacao.status == 'aprovado' %}
+                                                        <span class="badge bg-success">Aprovado</span>
+                                                    {% elif solicitacao.status == 'rejeitado' %}
+                                                        <span class="badge bg-danger">Rejeitado</span>
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h6>Justificativa</h6>
+                                        <p class="text-muted">{{ solicitacao.justificativa }}</p>
+                                        
+                                        {% if solicitacao.status != 'pendente' %}
+                                        <h6>Avaliação do Gerente</h6>
+                                        <p><strong>Avaliado por:</strong> {{ solicitacao.avaliado_por.get_full_name }}</p>
+                                        {% if solicitacao.data_resposta %}
+                                        <p><strong>Data da Resposta:</strong> {{ solicitacao.data_resposta|date:"d/m/Y H:i:s" }}</p>
+                                        {% endif %}
+                                        {% if solicitacao.observacoes_gerente %}
+                                        <p><strong>Observações:</strong></p>
+                                        <p class="text-muted">{{ solicitacao.observacoes_gerente }}</p>
+                                        {% endif %}
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Paginação -->
+            {% if is_paginated %}
+            <nav aria-label="Paginação">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page=1">Primeira</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+                    </li>
+                    {% endif %}
+                    
+                    <li class="page-item active">
+                        <span class="page-link">{{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
+                    </li>
+                    
+                    {% if page_obj.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.next_page_number }}">Próxima</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}">Última</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+
+            {% else %}
+            <!-- Nenhuma Solicitação -->
+            <div class="text-center py-5">
+                <i class="bi bi-credit-card-2-front" style="font-size: 4rem; color: #ccc;"></i>
+                <h3 class="mt-3">Você ainda não fez nenhuma solicitação de crédito</h3>
+                <p class="text-muted">Solicite crédito para ter mais flexibilidade em suas compras.</p>
+                <a href="{% url 'credito:solicitar' %}" class="btn btn-primary btn-lg">
+                    <i class="bi bi-credit-card"></i> Solicitar Crédito
+                </a>
+            </div>
+            {% endif %}
+        </main>
+    </div>
+</div>
+{% endblock %}

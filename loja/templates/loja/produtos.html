@@ -1,0 +1,194 @@
+{% extends "usuarios/base.html" %}
+
+{% block title %}Produtos - Galaxy Bank{% endblock %}
+
+{% block content %}
+<div class="container-fluid h-100">
+    <div class="row h-100">
+        <!-- Sidebar -->
+        <div class="col-md-3 col-lg-2 sidebar bg-dark">
+            <div class="position-sticky pt-3">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'usuarios:dashboard_cliente' %}">
+                            <i class="bi bi-speedometer2"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'loja:home' %}">
+                            <i class="bi bi-shop"></i> Loja
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{% url 'loja:produtos' %}">
+                            <i class="bi bi-grid"></i> Produtos
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'loja:carrinho' %}">
+                            <i class="bi bi-cart"></i> Carrinho
+                            {% if quantidade_carrinho > 0 %}
+                                <span class="badge bg-primary">{{ quantidade_carrinho }}</span>
+                            {% endif %}
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Main content -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2">
+                    <i class="bi bi-grid"></i> Produtos
+                </h1>
+                <div class="btn-toolbar mb-2 mb-md-0">
+                    <a href="{% url 'loja:carrinho' %}" class="btn btn-success">
+                        <i class="bi bi-cart"></i> Carrinho ({{ quantidade_carrinho }})
+                    </a>
+                </div>
+            </div>
+
+            <!-- Filtros -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <form method="get" class="row g-3">
+                                <div class="col-md-4">
+                                    <label class="form-label">Categoria</label>
+                                    <select name="categoria" class="form-select">
+                                        <option value="">Todas</option>
+                                        {% for categoria in categorias %}
+                                        <option value="{{ categoria.id }}" {% if categoria.id == categoria_selecionada %}selected{% endif %}>
+                                            {{ categoria.nome }}
+                                        </option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Buscar</label>
+                                    <input type="text" name="busca" value="{{ busca }}" class="form-control" placeholder="Nome do produto">
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">Ordenar por</label>
+                                    <select name="ordenacao" class="form-select">
+                                        <option value="-data_criacao" {% if ordenacao == '-data_criacao' %}selected{% endif %}>Mais recentes</option>
+                                        <option value="preco_vista" {% if ordenacao == 'preco_vista' %}selected{% endif %}>Menor preço</option>
+                                        <option value="-preco_vista" {% if ordenacao == '-preco_vista' %}selected{% endif %}>Maior preço</option>
+                                        <option value="-avaliacao" {% if ordenacao == '-avaliacao' %}selected{% endif %}>Melhor avaliação</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-2">
+                                    <label class="form-label">&nbsp;</label>
+                                    <button type="submit" class="btn btn-primary w-100">Filtrar</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lista de Produtos -->
+            <div class="row">
+                {% for produto in page_obj %}
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card h-100">
+                        <img src="{{ produto.imagem_url }}" class="card-img-top" alt="{{ produto.titulo }}" style="height: 250px; object-fit: contain;">
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title">{{ produto.titulo|truncatechars:60 }}</h5>
+                            <p class="card-text flex-grow-1">{{ produto.descricao|truncatechars:100 }}</p>
+                            <div class="mt-auto">
+                                <div class="row mb-2">
+                                    <div class="col-6">
+                                        <small class="text-success">À vista:</small><br>
+                                        <strong class="text-success h5">R$ {{ produto.preco_vista|floatformat:2 }}</strong>
+                                    </div>
+                                    <div class="col-6">
+                                        <small class="text-warning">Parcelado:</small><br>
+                                        <strong class="text-warning h5">R$ {{ produto.preco_prazo|floatformat:2 }}</strong>
+                                    </div>
+                                </div>
+                                <div class="d-grid gap-2">
+                                    <a href="{% url 'loja:produto_detalhes' produto.id %}" class="btn btn-outline-primary">Ver Detalhes</a>
+                                    <button class="btn btn-success" onclick="adicionarCarrinho({{ produto.id }})">Adicionar ao Carrinho</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="col-12">
+                    <div class="alert alert-info text-center">
+                        <i class="bi bi-info-circle"></i>
+                        Nenhum produto encontrado.
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Paginação -->
+            {% if page_obj.has_other_pages %}
+            <nav aria-label="Paginação">
+                <ul class="pagination justify-content-center">
+                    {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if busca %}&busca={{ busca }}{% endif %}{% if categoria_selecionada %}&categoria={{ categoria_selecionada }}{% endif %}{% if ordenacao %}&ordenacao={{ ordenacao }}{% endif %}">
+                                Anterior
+                            </a>
+                        </li>
+                    {% endif %}
+                    
+                    {% for num in page_obj.paginator.page_range %}
+                        {% if page_obj.number == num %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ num }}</span>
+                            </li>
+                        {% else %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}{% if busca %}&busca={{ busca }}{% endif %}{% if categoria_selecionada %}&categoria={{ categoria_selecionada }}{% endif %}{% if ordenacao %}&ordenacao={{ ordenacao }}{% endif %}">
+                                    {{ num }}
+                                </a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if busca %}&busca={{ busca }}{% endif %}{% if categoria_selecionada %}&categoria={{ categoria_selecionada }}{% endif %}{% if ordenacao %}&ordenacao={{ ordenacao }}{% endif %}">
+                                Próxima
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        </main>
+    </div>
+</div>
+
+<script>
+function adicionarCarrinho(produtoId) {
+    fetch(`/loja/adicionar-carrinho/${produtoId}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: 'quantidade=1'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('Produto adicionado ao carrinho!');
+            location.reload();
+        } else {
+            alert('Erro: ' + data.message);
+        }
+    })
+    .catch(error => {
+        alert('Erro ao adicionar produto');
+    });
+}
+</script>
+{% endblock %}

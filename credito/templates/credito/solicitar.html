@@ -1,0 +1,246 @@
+{% extends "usuarios/base.html" %}
+
+{% block title %}Solicitar Crédito - Galaxy Bank{% endblock %}
+
+{% block content %}
+<div class="container-fluid h-100">
+    <div class="row h-100">
+        <!-- Sidebar -->
+        <div class="col-md-3 col-lg-2 sidebar bg-dark">
+            <div class="position-sticky pt-3">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'usuarios:dashboard_cliente' %}">
+                            <i class="bi bi-speedometer2"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{% url 'credito:solicitar' %}">
+                            <i class="bi bi-credit-card"></i> Solicitar Crédito
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'credito:minhas_solicitacoes' %}">
+                            <i class="bi bi-list-check"></i> Minhas Solicitações
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Main content -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
+                <h1 class="h2">
+                    <i class="bi bi-credit-card"></i> Solicitar Crédito
+                </h1>
+            </div>
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <div class="row">
+                <!-- Formulário de Solicitação -->
+                <div class="col-lg-8 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Nova Solicitação de Crédito</h5>
+                        </div>
+                        <div class="card-body">
+                            <form method="post">
+                                {% csrf_token %}
+                                
+                                <!-- Valor Solicitado -->
+                                <div class="mb-3">
+                                    <label for="{{ form.valor_solicitado.id_for_label }}" class="form-label">
+                                        {{ form.valor_solicitado.label }}
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">R$</span>
+                                        {{ form.valor_solicitado }}
+                                    </div>
+                                    {% if form.valor_solicitado.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {% for error in form.valor_solicitado.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                    <div class="form-text">
+                                        Valor mínimo: R$ 100,00 | Valor máximo: R$ 50.000,00
+                                    </div>
+                                </div>
+                                
+                                <!-- Justificativa -->
+                                <div class="mb-3">
+                                    <label for="{{ form.justificativa.id_for_label }}" class="form-label">
+                                        {{ form.justificativa.label }}
+                                    </label>
+                                    {{ form.justificativa }}
+                                    {% if form.justificativa.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {% for error in form.justificativa.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                    <div class="form-text">
+                                        Explique o motivo da solicitação de crédito. Seja claro e objetivo.
+                                    </div>
+                                </div>
+                                
+                                <!-- Renda Mensal -->
+                                <div class="mb-3">
+                                    <label for="{{ form.renda_mensal.id_for_label }}" class="form-label">
+                                        {{ form.renda_mensal.label }}
+                                    </label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">R$</span>
+                                        {{ form.renda_mensal }}
+                                    </div>
+                                    {% if form.renda_mensal.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {% for error in form.renda_mensal.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                    <div class="form-text">
+                                        Informe sua renda mensal líquida para análise de crédito.
+                                    </div>
+                                </div>
+                                
+                                <!-- Profissão -->
+                                <div class="mb-3">
+                                    <label for="{{ form.profissao.id_for_label }}" class="form-label">
+                                        {{ form.profissao.label }}
+                                    </label>
+                                    {{ form.profissao }}
+                                    {% if form.profissao.errors %}
+                                        <div class="text-danger small mt-1">
+                                            {% for error in form.profissao.errors %}
+                                                {{ error }}
+                                            {% endfor %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <!-- Termos e Condições -->
+                                <div class="mb-4">
+                                    <div class="card bg-light">
+                                        <div class="card-body">
+                                            <h6>Termos e Condições</h6>
+                                            <ul class="small mb-3">
+                                                <li>O crédito será analisado pela equipe do Galaxy Bank</li>
+                                                <li>A análise pode levar até 3 dias úteis</li>
+                                                <li>Você será notificado sobre a aprovação ou rejeição</li>
+                                                <li>Em caso de aprovação, o limite será disponibilizado em sua conta</li>
+                                                <li>Juros e taxas serão aplicados conforme política da instituição</li>
+                                                <li>O não pagamento pode resultar em negativação</li>
+                                            </ul>
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="aceito_termos" name="aceito_termos" required>
+                                                <label class="form-check-label" for="aceito_termos">
+                                                    Aceito os termos e condições
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="d-grid">
+                                    <button type="submit" class="btn btn-primary btn-lg">
+                                        <i class="bi bi-send"></i> Enviar Solicitação
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Informações da Conta -->
+                <div class="col-lg-4 mb-4">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Informações da Conta</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="mb-3">
+                                <h6>Saldo Atual</h6>
+                                <span class="badge bg-primary fs-6">R$ {{ user.cliente.saldo|floatformat:2 }}</span>
+                            </div>
+                            
+                            {% if user.cliente.limite_credito_aprovado %}
+                            <div class="mb-3">
+                                <h6>Limite de Crédito Atual</h6>
+                                <span class="badge bg-success fs-6">R$ {{ user.cliente.limite_credito|floatformat:2 }}</span>
+                            </div>
+                            {% else %}
+                            <div class="mb-3">
+                                <div class="alert alert-info">
+                                    <i class="bi bi-info-circle"></i>
+                                    Você ainda não possui limite de crédito aprovado.
+                                </div>
+                            </div>
+                            {% endif %}
+                            
+                            <hr>
+                            
+                            <h6>Histórico de Solicitações</h6>
+                            {% if solicitacoes_recentes %}
+                                {% for solicitacao in solicitacoes_recentes %}
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <div>
+                                        <small>R$ {{ solicitacao.valor_solicitado|floatformat:2 }}</small><br>
+                                        <small class="text-muted">{{ solicitacao.data_solicitacao|date:"d/m/Y" }}</small>
+                                    </div>
+                                    <div>
+                                        {% if solicitacao.status == 'pendente' %}
+                                            <span class="badge bg-warning">Pendente</span>
+                                        {% elif solicitacao.status == 'aprovado' %}
+                                            <span class="badge bg-success">Aprovado</span>
+                                        {% elif solicitacao.status == 'rejeitado' %}
+                                            <span class="badge bg-danger">Rejeitado</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            {% else %}
+                                <p class="text-muted small">Nenhuma solicitação anterior.</p>
+                            {% endif %}
+                            
+                            <div class="mt-3">
+                                <a href="{% url 'credito:minhas_solicitacoes' %}" class="btn btn-outline-primary btn-sm w-100">
+                                    Ver Todas as Solicitações
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Dicas -->
+                    <div class="card mt-3">
+                        <div class="card-header">
+                            <h5 class="mb-0">Dicas para Aprovação</h5>
+                        </div>
+                        <div class="card-body">
+                            <ul class="small mb-0">
+                                <li>Mantenha seus dados atualizados</li>
+                                <li>Seja realista com o valor solicitado</li>
+                                <li>Forneça justificativas claras</li>
+                                <li>Comprove sua renda adequadamente</li>
+                                <li>Mantenha bom histórico de pagamentos</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+{% endblock %}

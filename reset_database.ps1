@@ -119,6 +119,15 @@ if ($LASTEXITCODE -eq 0) {
     exit 1
 }
 
+# 6. Sincronizar produtos
+Write-Host "6. Sincronizando produtos da API..." -ForegroundColor Yellow
+python manage.py sincronizar_produtos
+if ($LASTEXITCODE -eq 0) {
+    Write-Host "   OK Produtos sincronizados com sucesso" -ForegroundColor Green
+} else {
+    Write-Host "   ERRO ao sincronizar produtos" -ForegroundColor Red
+}
+
 Write-Host ""
 Write-Host "=== Setup Concluido com Sucesso! ===" -ForegroundColor Green
 Write-Host ""
@@ -132,8 +141,8 @@ Write-Host "| Gerente      | gerente@galaxybank.com  | Mesp@2025  |" -Foreground
 Write-Host "+--------------+-------------------------+------------+" -ForegroundColor Gray
 Write-Host ""
 
-# 6. Iniciar servidor
-Write-Host "6. Iniciando servidor Django..." -ForegroundColor Yellow
+# 7. Iniciar servidor
+Write-Host "7. Iniciando servidor Django..." -ForegroundColor Yellow
 Write-Host "   Servidor sera iniciado em: http://127.0.0.1:8000/" -ForegroundColor Cyan
 Write-Host "   Pressione Ctrl+C para parar o servidor" -ForegroundColor Gray
 Write-Host ""

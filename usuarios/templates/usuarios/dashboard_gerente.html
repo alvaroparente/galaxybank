@@ -15,18 +15,18 @@
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link" href="{% url 'credito:avaliar_solicitacoes' %}">
+                        <i class="bi bi-credit-card"></i> Avaliar Crédito
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'credito:solicitacoes_avaliadas' %}">
+                        <i class="bi bi-check-circle"></i> Avaliações Feitas
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link" href="#">
                         <i class="bi bi-people"></i> Clientes
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <i class="bi bi-cash-coin"></i> Empréstimos
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <i class="bi bi-credit-card"></i> Crédito
                     </a>
                 </li>
                 <li class="nav-item">
@@ -35,13 +35,8 @@
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <i class="bi bi-graph-up-arrow"></i> Investimentos
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <i class="bi bi-gear"></i> Configurações
+                    <a class="nav-link" href="{% url 'usuarios:perfil' %}">
+                        <i class="bi bi-person"></i> Perfil
                     </a>
                 </li>
             </ul>

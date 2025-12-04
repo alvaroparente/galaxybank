@@ -1,0 +1,203 @@
+{% extends "usuarios/base.html" %}
+
+{% block title %}Detalhes do Produto - Galaxy Bank{% endblock %}
+
+{% block content %}
+<div class="container-fluid h-100">
+    <div class="row h-100">
+        <!-- Sidebar -->
+        <div class="col-md-3 col-lg-2 sidebar bg-dark">
+            <div class="position-sticky pt-3">
+                <ul class="nav flex-column">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'usuarios:dashboard_cliente' %}">
+                            <i class="bi bi-speedometer2"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="{% url 'loja:home' %}">
+                            <i class="bi bi-shop"></i> Loja
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'loja:carrinho' %}">
+                            <i class="bi bi-cart"></i> Carrinho
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Main content -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <div class="pt-3 pb-2 mb-3">
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="{% url 'loja:home' %}">Loja</a></li>
+                        <li class="breadcrumb-item"><a href="{% url 'loja:produtos' %}">Produtos</a></li>
+                        <li class="breadcrumb-item active">{{ produto.titulo }}</li>
+                    </ol>
+                </nav>
+            </div>
+
+            <div class="row">
+                <!-- Imagem do Produto -->
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100">
+                        <img src="{{ produto.imagem_url }}" class="card-img-top" alt="{{ produto.titulo }}" style="height: 400px; object-fit: contain;">
+                        <div class="card-body text-center">
+                            <!-- Miniaturas de imagem (se houver mais imagens) -->
+                            <div class="d-flex justify-content-center mt-3">
+                                <img src="{{ produto.imagem_url }}" class="rounded me-2" style="width: 60px; height: 60px; object-fit: cover; cursor: pointer; border: 2px solid #007bff;" alt="Imagem principal">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Informações do Produto -->
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h1 class="card-title h3">{{ produto.titulo }}</h1>
+                            
+                            <!-- Categoria -->
+                            <div class="mb-3">
+                                <span class="badge bg-secondary">{{ produto.categoria|capfirst }}</span>
+                            </div>
+                            
+                            <!-- Avaliação (simulada) -->
+                            <div class="mb-3">
+                                <div class="d-flex align-items-center">
+                                    <div class="text-warning me-2">
+                                        {% for i in "12345" %}
+                                            {% if produto.rating >= forloop.counter %}
+                                                <i class="bi bi-star-fill"></i>
+                                            {% else %}
+                                                <i class="bi bi-star"></i>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </div>
+                                    <span class="text-muted">({{ produto.rating }}/5)</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Preço -->
+                            <div class="mb-4">
+                                <h2 class="text-primary mb-0">R$ {{ produto.preco|floatformat:2 }}</h2>
+                                <small class="text-muted">à vista no saldo ou parcelado no crédito</small>
+                            </div>
+                            
+                            <!-- Descrição -->
+                            <div class="mb-4">
+                                <h5>Descrição</h5>
+                                <p class="text-muted">{{ produto.descricao }}</p>
+                            </div>
+                            
+                            <!-- Quantidade e Comprar -->
+                            <form method="post" action="{% url 'loja:adicionar_carrinho' produto.id %}">
+                                {% csrf_token %}
+                                <div class="row align-items-end mb-3">
+                                    <div class="col-md-4">
+                                        <label for="quantidade" class="form-label">Quantidade:</label>
+                                        <div class="input-group">
+                                            <button class="btn btn-outline-secondary" type="button" id="diminuir">-</button>
+                                            <input type="number" class="form-control text-center" id="quantidade" name="quantidade" value="1" min="1" max="10">
+                                            <button class="btn btn-outline-secondary" type="button" id="aumentar">+</button>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <button type="submit" class="btn btn-primary btn-lg w-100">
+                                            <i class="bi bi-cart-plus"></i> Adicionar ao Carrinho
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                            
+                            <!-- Informações de Saldo -->
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="card bg-light">
+                                        <div class="card-body">
+                                            <h6>Seu Saldo Atual</h6>
+                                            <div class="d-flex justify-content-between align-items-center">
+                                                <span>Saldo Disponível:</span>
+                                                <span class="badge bg-primary">R$ {{ user.cliente.saldo|floatformat:2 }}</span>
+                                            </div>
+                                            {% if user.cliente.limite_credito_aprovado %}
+                                            <div class="d-flex justify-content-between align-items-center mt-2">
+                                                <span>Limite de Crédito:</span>
+                                                <span class="badge bg-success">R$ {{ user.cliente.limite_credito|floatformat:2 }}</span>
+                                            </div>
+                                            {% endif %}
+                                            {% if produto.preco > user.cliente.saldo %}
+                                                {% if not user.cliente.limite_credito_aprovado %}
+                                                <div class="alert alert-warning mt-3 mb-0">
+                                                    <i class="bi bi-exclamation-triangle"></i> 
+                                                    Saldo insuficiente. <a href="{% url 'credito:solicitar' %}">Solicite crédito</a> para comprar este produto.
+                                                </div>
+                                                {% endif %}
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Produtos Relacionados -->
+            {% if produtos_relacionados %}
+            <div class="row mt-5">
+                <div class="col-12">
+                    <h3>Produtos Relacionados</h3>
+                    <hr>
+                </div>
+            </div>
+            
+            <div class="row">
+                {% for produto_rel in produtos_relacionados %}
+                <div class="col-md-3 mb-4">
+                    <div class="card h-100">
+                        <img src="{{ produto_rel.imagem_url }}" class="card-img-top" alt="{{ produto_rel.titulo }}" style="height: 200px; object-fit: contain;">
+                        <div class="card-body d-flex flex-column">
+                            <h6 class="card-title">{{ produto_rel.titulo|truncatechars:50 }}</h6>
+                            <p class="card-text text-muted small flex-grow-1">{{ produto_rel.descricao|truncatechars:80 }}</p>
+                            <div class="mt-auto">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <strong class="text-primary">R$ {{ produto_rel.preco|floatformat:2 }}</strong>
+                                    <a href="{% url 'loja:produto_detalhes' produto_rel.id %}" class="btn btn-sm btn-outline-primary">Ver</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </main>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const quantidadeInput = document.getElementById('quantidade');
+    const diminuirBtn = document.getElementById('diminuir');
+    const aumentarBtn = document.getElementById('aumentar');
+    
+    diminuirBtn.addEventListener('click', function() {
+        let quantidade = parseInt(quantidadeInput.value);
+        if (quantidade > 1) {
+            quantidadeInput.value = quantidade - 1;
+        }
+    });
+    
+    aumentarBtn.addEventListener('click', function() {
+        let quantidade = parseInt(quantidadeInput.value);
+        if (quantidade < 10) {
+            quantidadeInput.value = quantidade + 1;
+        }
+    });
+});
+</script>
+{% endblock %}
