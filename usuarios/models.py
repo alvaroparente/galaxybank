@@ -58,3 +58,41 @@ class Gerente(models.Model):
     
     def __str__(self):
         return f"Gerente {self.usuario.first_name} {self.usuario.last_name} - {self.codigo_gerente}"
+
+class Transacao(models.Model):
+    """Modelo para registrar transações dos clientes"""
+    TIPO_TRANSACAO_CHOICES = [
+        ('deposito', 'Depósito'),
+        ('transferencia_enviada', 'Transferência Enviada'),
+        ('transferencia_recebida', 'Transferência Recebida'),
+        ('compra', 'Compra'),
+        ('pagamento_fatura', 'Pagamento de Fatura'),
+    ]
+    
+    cliente = models.ForeignKey(Cliente, on_delete=models.CASCADE, related_name='transacoes_origem')
+    tipo = models.CharField(max_length=25, choices=TIPO_TRANSACAO_CHOICES)
+    valor = models.DecimalField(max_digits=10, decimal_places=2)
+    descricao = models.TextField(blank=True)
+    data_transacao = models.DateTimeField(auto_now_add=True)
+    
+    # Para transferências
+    destinatario = models.ForeignKey(Cliente, on_delete=models.SET_NULL, null=True, blank=True, related_name='transacoes_recebidas')
+    origem = models.ForeignKey(Cliente, on_delete=models.SET_NULL, null=True, blank=True, related_name='transacoes_como_origem')
+    
+    class Meta:
+        verbose_name = 'Transação'
+        verbose_name_plural = 'Transações'
+        ordering = ['-data_transacao']
+    
+    def __str__(self):
+        return f"{self.get_tipo_display()} - R$ {self.valor} - {self.cliente.usuario.first_name}"
+    
+    @property
+    def eh_entrada(self):
+        """Retorna True se a transação representa entrada de dinheiro"""
+        return self.tipo in ['deposito', 'transferencia_recebida']
+    
+    @property
+    def eh_saida(self):
+        """Retorna True se a transação representa saída de dinheiro"""
+        return self.tipo in ['transferencia_enviada', 'compra', 'pagamento_fatura']

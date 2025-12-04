@@ -65,8 +65,8 @@
                         <div class="card-body text-center">
                             <i class="bi bi-people-fill text-primary fs-1"></i>
                             <h5 class="card-title mt-2">Total Clientes</h5>
-                            <h3 class="text-primary">1,247</h3>
-                            <small class="text-success"><i class="bi bi-arrow-up"></i> +5.2% este mês</small>
+                            <h3 class="text-primary">{{ total_clientes }}</h3>
+                            <small class="text-success"><i class="bi bi-arrow-up"></i> +{{ novos_clientes_mes }} este mês</small>
                         </div>
                     </div>
                 </div>
@@ -74,9 +74,9 @@
                     <div class="card stats-card border-0 shadow-sm">
                         <div class="card-body text-center">
                             <i class="bi bi-cash-stack text-success fs-1"></i>
-                            <h5 class="card-title mt-2">Empréstimos</h5>
-                            <h3 class="text-success">R$ 2.8M</h3>
-                            <small class="text-success"><i class="bi bi-arrow-up"></i> +12.8% este mês</small>
+                            <h5 class="card-title mt-2">Crédito Aprovado</h5>
+                            <h3 class="text-success">R$ {{ total_credito_aprovado|floatformat:0 }}</h3>
+                            <small class="text-muted">Total em créditos</small>
                         </div>
                     </div>
                 </div>
@@ -84,9 +84,9 @@
                     <div class="card stats-card border-0 shadow-sm">
                         <div class="card-body text-center">
                             <i class="bi bi-credit-card text-warning fs-1"></i>
-                            <h5 class="card-title mt-2">Cartões Ativos</h5>
-                            <h3 class="text-warning">892</h3>
-                            <small class="text-success"><i class="bi bi-arrow-up"></i> +3.1% este mês</small>
+                            <h5 class="card-title mt-2">Solicitações</h5>
+                            <h3 class="text-warning">{{ solicitacoes_pendentes }}</h3>
+                            <small class="text-muted">Pendentes de análise</small>
                         </div>
                     </div>
                 </div>
@@ -94,9 +94,9 @@
                     <div class="card stats-card border-0 shadow-sm">
                         <div class="card-body text-center">
                             <i class="bi bi-graph-up-arrow text-info fs-1"></i>
-                            <h5 class="card-title mt-2">Investimentos</h5>
-                            <h3 class="text-info">R$ 5.2M</h3>
-                            <small class="text-success"><i class="bi bi-arrow-up"></i> +8.7% este mês</small>
+                            <h5 class="card-title mt-2">Novos Clientes</h5>
+                            <h3 class="text-info">{{ novos_clientes_mes }}</h3>
+                            <small class="text-muted">Este mês</small>
                         </div>
                     </div>
                 </div>

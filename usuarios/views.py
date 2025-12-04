@@ -1,10 +1,14 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.views.decorators.csrf import csrf_protect
-from django.http import HttpResponse
-from .models import Cliente, Gerente
+from django.http import HttpResponse, JsonResponse
+from django.views.decorators.http import require_POST
+from django.db import transaction
+from decimal import Decimal
+from datetime import date, datetime, timedelta
+from .models import Cliente, Gerente, Transacao
 from .forms import RegistroUsuarioForm, RegistroClienteForm, RegistroSenhaForm
 
 User = get_user_model()
@@ -52,9 +56,23 @@ def dashboard_cliente(request):
     """Dashboard do cliente"""
     try:
         cliente = Cliente.objects.get(usuario=request.user)
+        
+        # Buscar últimas transações
+        ultimas_transacoes = cliente.transacoes_origem.order_by('-data_transacao')[:5]
+        
+        # Estatísticas do mês atual
+        inicio_mes = date.today().replace(day=1)
+        transacoes_mes = cliente.transacoes_origem.filter(data_transacao__gte=inicio_mes)
+        
+        total_gastos_mes = sum(t.valor for t in transacoes_mes if t.tipo in ['compra', 'transferencia_enviada']) or Decimal('0.00')
+        total_recebido_mes = sum(t.valor for t in transacoes_mes if t.tipo in ['deposito', 'transferencia_recebida']) or Decimal('0.00')
+        
         context = {
             'cliente': cliente,
             'usuario': request.user,
+            'ultimas_transacoes': ultimas_transacoes,
+            'total_gastos_mes': total_gastos_mes,
+            'total_recebido_mes': total_recebido_mes,
         }
         return render(request, 'usuarios/dashboard_cliente.html', context)
     except Cliente.DoesNotExist:
@@ -66,9 +84,26 @@ def dashboard_gerente(request):
     """Dashboard do gerente"""
     try:
         gerente = Gerente.objects.get(usuario=request.user)
+        
+        # Estatísticas dinâmicas
+        total_clientes = Cliente.objects.count()
+        total_credito_aprovado = sum(c.limite_credito for c in Cliente.objects.filter(limite_credito_aprovado=True))
+        
+        # Crescimento mensal
+        inicio_mes = date.today().replace(day=1)
+        novos_clientes_mes = Cliente.objects.filter(usuario__date_joined__gte=inicio_mes).count()
+        
+        # Solicitações pendentes de crédito
+        from credito.models import SolicitacaoCredito
+        solicitacoes_pendentes = SolicitacaoCredito.objects.filter(status='pendente').count()
+        
         context = {
             'gerente': gerente,
             'usuario': request.user,
+            'total_clientes': total_clientes,
+            'total_credito_aprovado': total_credito_aprovado,
+            'novos_clientes_mes': novos_clientes_mes,
+            'solicitacoes_pendentes': solicitacoes_pendentes,
         }
         return render(request, 'usuarios/dashboard_gerente.html', context)
     except Gerente.DoesNotExist:
@@ -285,3 +320,188 @@ def perfil_editar(request):
     }
     
     return render(request, 'usuarios/perfil_editar.html', context)
+
+# ===== VIEWS DE TRANSFERÊNCIA E DEPÓSITO =====
+
+@login_required
+@csrf_protect
+def transferencia(request):
+    """View para realizar transferências entre contas"""
+    if request.user.tipo_usuario != 'cliente':
+        messages.error(request, 'Apenas clientes podem realizar transferências.')
+        return redirect('usuarios:dashboard_cliente')
+    
+    try:
+        cliente = Cliente.objects.get(usuario=request.user)
+    except Cliente.DoesNotExist:
+        messages.error(request, 'Perfil de cliente não encontrado.')
+        return redirect('usuarios:login')
+    
+    if request.method == 'POST':
+        destinatario_cpf = request.POST.get('destinatario_cpf', '').strip()
+        valor_str = request.POST.get('valor', '').replace(',', '.').strip()
+        descricao = request.POST.get('descricao', '').strip()
+        
+        if not all([destinatario_cpf, valor_str]):
+            messages.error(request, 'Todos os campos obrigatórios devem ser preenchidos.')
+            return render(request, 'usuarios/transferencia.html', {'cliente': cliente})
+        
+        try:
+            valor = Decimal(valor_str)
+            if valor <= 0:
+                raise ValueError("Valor deve ser positivo")
+        except (ValueError, TypeError):
+            messages.error(request, 'Valor inválido. Use formato: 123.45')
+            return render(request, 'usuarios/transferencia.html', {'cliente': cliente})
+        
+        if valor > cliente.saldo:
+            messages.error(request, 'Saldo insuficiente para realizar a transferência.')
+            return render(request, 'usuarios/transferencia.html', {'cliente': cliente})
+        
+        try:
+            destinatario = Cliente.objects.get(cpf=destinatario_cpf)
+            if destinatario == cliente:
+                messages.error(request, 'Não é possível transferir para sua própria conta.')
+                return render(request, 'usuarios/transferencia.html', {'cliente': cliente})
+        except Cliente.DoesNotExist:
+            messages.error(request, 'Destinatário não encontrado. Verifique o CPF.')
+            return render(request, 'usuarios/transferencia.html', {'cliente': cliente})
+        
+        # Realizar transferência
+        with transaction.atomic():
+            # Debitar do remetente
+            cliente.saldo -= valor
+            cliente.save()
+            
+            # Creditar ao destinatário
+            destinatario.saldo += valor
+            destinatario.save()
+            
+            # Registrar transações
+            Transacao.objects.create(
+                cliente=cliente,
+                tipo='transferencia_enviada',
+                valor=valor,
+                descricao=f'Transferência para {destinatario.usuario.first_name} ({destinatario.cpf}) - {descricao}' if descricao else f'Transferência para {destinatario.usuario.first_name} ({destinatario.cpf})',
+                destinatario=destinatario
+            )
+            
+            Transacao.objects.create(
+                cliente=destinatario,
+                tipo='transferencia_recebida',
+                valor=valor,
+                descricao=f'Transferência de {cliente.usuario.first_name} ({cliente.cpf}) - {descricao}' if descricao else f'Transferência de {cliente.usuario.first_name} ({cliente.cpf})',
+                origem=cliente
+            )
+        
+        messages.success(request, f'Transferência de R$ {valor:.2f} realizada com sucesso para {destinatario.usuario.first_name}!')
+        return redirect('usuarios:dashboard_cliente')
+    
+    context = {
+        'cliente': cliente,
+    }
+    return render(request, 'usuarios/transferencia.html', context)
+
+@login_required
+@csrf_protect
+def deposito(request):
+    """View para realizar depósitos na conta"""
+    if request.user.tipo_usuario != 'cliente':
+        messages.error(request, 'Apenas clientes podem realizar depósitos.')
+        return redirect('usuarios:dashboard_cliente')
+    
+    try:
+        cliente = Cliente.objects.get(usuario=request.user)
+    except Cliente.DoesNotExist:
+        messages.error(request, 'Perfil de cliente não encontrado.')
+        return redirect('usuarios:login')
+    
+    if request.method == 'POST':
+        valor_str = request.POST.get('valor', '').replace(',', '.').strip()
+        descricao = request.POST.get('descricao', '').strip()
+        
+        if not valor_str:
+            messages.error(request, 'O valor do depósito é obrigatório.')
+            return render(request, 'usuarios/deposito.html', {'cliente': cliente})
+        
+        try:
+            valor = Decimal(valor_str)
+            if valor <= 0:
+                raise ValueError("Valor deve ser positivo")
+            if valor > Decimal('10000.00'):
+                messages.error(request, 'O valor máximo para depósito é R$ 10.000,00.')
+                return render(request, 'usuarios/deposito.html', {'cliente': cliente})
+        except (ValueError, TypeError):
+            messages.error(request, 'Valor inválido. Use formato: 123.45')
+            return render(request, 'usuarios/deposito.html', {'cliente': cliente})
+        
+        # Realizar depósito
+        with transaction.atomic():
+            cliente.saldo += valor
+            cliente.save()
+            
+            # Registrar transação
+            Transacao.objects.create(
+                cliente=cliente,
+                tipo='deposito',
+                valor=valor,
+                descricao=f'Depósito - {descricao}' if descricao else 'Depósito'
+            )
+        
+        messages.success(request, f'Depósito de R$ {valor:.2f} realizado com sucesso!')
+        return redirect('usuarios:dashboard_cliente')
+    
+    context = {
+        'cliente': cliente,
+    }
+    return render(request, 'usuarios/deposito.html', context)
+
+@login_required
+def extrato(request):
+    """View para visualizar o extrato de transações"""
+    if request.user.tipo_usuario != 'cliente':
+        messages.error(request, 'Apenas clientes podem visualizar o extrato.')
+        return redirect('usuarios:dashboard_cliente')
+    
+    try:
+        cliente = Cliente.objects.get(usuario=request.user)
+    except Cliente.DoesNotExist:
+        messages.error(request, 'Perfil de cliente não encontrado.')
+        return redirect('usuarios:login')
+    
+    # Filtros
+    periodo = request.GET.get('periodo', '30')  # últimos 30 dias por padrão
+    tipo_filtro = request.GET.get('tipo', 'todas')
+    
+    # Calcular data inicial
+    if periodo == '7':
+        data_inicial = date.today() - timedelta(days=7)
+    elif periodo == '30':
+        data_inicial = date.today() - timedelta(days=30)
+    elif periodo == '90':
+        data_inicial = date.today() - timedelta(days=90)
+    else:
+        data_inicial = date.today() - timedelta(days=30)
+    
+    # Buscar transações
+    transacoes = cliente.transacoes_origem.filter(data_transacao__gte=data_inicial)
+    
+    if tipo_filtro != 'todas':
+        transacoes = transacoes.filter(tipo=tipo_filtro)
+    
+    transacoes = transacoes.order_by('-data_transacao')
+    
+    # Estatísticas do período
+    total_entrada = sum(t.valor for t in transacoes if t.tipo in ['deposito', 'transferencia_recebida'])
+    total_saida = sum(t.valor for t in transacoes if t.tipo in ['transferencia_enviada', 'compra'])
+    
+    context = {
+        'cliente': cliente,
+        'transacoes': transacoes,
+        'periodo_selecionado': periodo,
+        'tipo_selecionado': tipo_filtro,
+        'total_entrada': total_entrada,
+        'total_saida': total_saida,
+        'saldo_periodo': total_entrada - total_saida,
+    }
+    return render(request, 'usuarios/extrato.html', context)

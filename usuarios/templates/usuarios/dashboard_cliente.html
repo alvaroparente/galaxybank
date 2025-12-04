@@ -15,6 +15,21 @@
                     </a>
                 </li>
                 <li class="nav-item">
+                    <a class="nav-link" href="{% url 'usuarios:transferencia' %}">
+                        <i class="bi bi-arrow-left-right"></i> Transferência
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'usuarios:deposito' %}">
+                        <i class="bi bi-wallet-fill"></i> Depósito
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'usuarios:extrato' %}">
+                        <i class="bi bi-list-check"></i> Extrato
+                    </a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link" href="{% url 'loja:home' %}">
                         <i class="bi bi-shop"></i> Loja
                     </a>
@@ -27,11 +42,6 @@
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'credito:solicitar' %}">
                         <i class="bi bi-credit-card"></i> Solicitar Crédito
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'credito:minhas_solicitacoes' %}">
-                        <i class="bi bi-file-text"></i> Solicitações
                     </a>
                 </li>
                 <li class="nav-item">
@@ -82,6 +92,26 @@
                 <div class="col-md-3 mb-3">
                     <div class="card stats-card border-0 shadow-sm">
                         <div class="card-body text-center">
+                            <i class="bi bi-arrow-up text-success fs-1"></i>
+                            <h5 class="card-title mt-2">Recebido (Mês)</h5>
+                            <h3 class="text-success">R$ {{ total_recebido_mes|floatformat:2 }}</h3>
+                            <small class="text-muted">Entradas do mês</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="card stats-card border-0 shadow-sm">
+                        <div class="card-body text-center">
+                            <i class="bi bi-arrow-down text-danger fs-1"></i>
+                            <h5 class="card-title mt-2">Gasto (Mês)</h5>
+                            <h3 class="text-danger">R$ {{ total_gastos_mes|floatformat:2 }}</h3>
+                            <small class="text-muted">Saídas do mês</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3 mb-3">
+                    <div class="card stats-card border-0 shadow-sm">
+                        <div class="card-body text-center">
                             <i class="bi bi-credit-card text-warning fs-1"></i>
                             <h5 class="card-title mt-2">Limite Crédito</h5>
                             {% if cliente.limite_credito_aprovado %}
@@ -89,27 +119,8 @@
                                 <small class="text-success"><i class="bi bi-check-circle"></i> Aprovado</small>
                             {% else %}
                                 <h3 class="text-muted">R$ 0,00</h3>
-                                <small class="text-muted">Não aprovado</small>
+                                <small class="text-muted"><a href="{% url 'credito:solicitar' %}">Solicitar</a></small>
                             {% endif %}
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3 mb-3">
-                    <div class="card stats-card border-0 shadow-sm">
-                        <div class="card-body text-center">
-                            <i class="bi bi-bag-check text-success fs-1"></i>
-                            <h5 class="card-title mt-2">Compras</h5>
-                            <h3 class="text-success">{{ cliente.compras.count }}</h3>
-                            <small class="text-muted">Total de pedidos</small>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3 mb-3">
-                    <div class="card stats-card border-0 shadow-sm">
-                        <div class="card-body text-center">
-                            <i class="bi bi-star-fill text-info fs-1"></i>
-                            <h5 class="card-title mt-2">Galaxy Points</h5>
-                            <h3 class="text-info">{{ cliente.score_pontos }}</h3>
                         </div>
                     </div>
                 </div>
@@ -123,40 +134,40 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-2 col-6 mb-3 text-center">
-                            <a href="{% url 'loja:home' %}" class="btn btn-outline-primary btn-lg mb-2 w-100">
+                            <a href="{% url 'usuarios:transferencia' %}" class="btn btn-outline-primary btn-lg mb-2 w-100">
+                                <i class="bi bi-arrow-left-right"></i>
+                            </a>
+                            <small class="d-block">Transferência</small>
+                        </div>
+                        <div class="col-md-2 col-6 mb-3 text-center">
+                            <a href="{% url 'usuarios:deposito' %}" class="btn btn-outline-success btn-lg mb-2 w-100">
+                                <i class="bi bi-wallet-fill"></i>
+                            </a>
+                            <small class="d-block">Depósito</small>
+                        </div>
+                        <div class="col-md-2 col-6 mb-3 text-center">
+                            <a href="{% url 'usuarios:extrato' %}" class="btn btn-outline-info btn-lg mb-2 w-100">
+                                <i class="bi bi-list-check"></i>
+                            </a>
+                            <small class="d-block">Extrato</small>
+                        </div>
+                        <div class="col-md-2 col-6 mb-3 text-center">
+                            <a href="{% url 'loja:home' %}" class="btn btn-outline-warning btn-lg mb-2 w-100">
                                 <i class="bi bi-shop"></i>
                             </a>
                             <small class="d-block">Loja</small>
                         </div>
                         <div class="col-md-2 col-6 mb-3 text-center">
-                            <a href="{% url 'loja:carrinho' %}" class="btn btn-outline-success btn-lg mb-2 w-100">
-                                <i class="bi bi-cart"></i>
-                            </a>
-                            <small class="d-block">Carrinho</small>
-                        </div>
-                        <div class="col-md-2 col-6 mb-3 text-center">
-                            <a href="{% url 'credito:solicitar' %}" class="btn btn-outline-warning btn-lg mb-2 w-100">
-                                <i class="bi bi-credit-card"></i>
-                            </a>
-                            <small class="d-block">Solicitar Crédito</small>
-                        </div>
-                        <div class="col-md-2 col-6 mb-3 text-center">
-                            <a href="{% url 'faturas:minhas_faturas' %}" class="btn btn-outline-info btn-lg mb-2 w-100">
+                            <a href="{% url 'faturas:minhas_faturas' %}" class="btn btn-outline-danger btn-lg mb-2 w-100">
                                 <i class="bi bi-receipt"></i>
                             </a>
                             <small class="d-block">Faturas</small>
                         </div>
                         <div class="col-md-2 col-6 mb-3 text-center">
-                            <a href="{% url 'loja:compras' %}" class="btn btn-outline-secondary btn-lg mb-2 w-100">
-                                <i class="bi bi-bag-check"></i>
+                            <a href="{% url 'credito:solicitar' %}" class="btn btn-outline-secondary btn-lg mb-2 w-100">
+                                <i class="bi bi-credit-card"></i>
                             </a>
-                            <small class="d-block">Compras</small>
-                        </div>
-                        <div class="col-md-2 col-6 mb-3 text-center">
-                            <button class="btn btn-outline-dark btn-lg mb-2 w-100">
-                                <i class="bi bi-shop"></i>
-                            </button>
-                            <small class="d-block">Shopping</small>
+                            <small class="d-block">Crédito</small>
                         </div>
                     </div>
                 </div>
@@ -170,44 +181,52 @@
                             <h5 class="mb-0"><i class="bi bi-clock-history"></i> Últimas Transações</h5>
                         </div>
                         <div class="card-body">
+                            {% if ultimas_transacoes %}
                             <div class="list-group list-group-flush">
+                                {% for transacao in ultimas_transacoes %}
                                 <div class="list-group-item d-flex justify-content-between align-items-center">
                                     <div class="d-flex align-items-center">
-                                        <div class="bg-success rounded-circle p-2 me-3">
-                                            <i class="bi bi-arrow-down text-white"></i>
+                                        <div class="rounded-circle p-2 me-3 {% if transacao.eh_entrada %}bg-success{% else %}bg-danger{% endif %}">
+                                            {% if transacao.tipo == 'deposito' %}
+                                                <i class="bi bi-plus-lg text-white"></i>
+                                            {% elif transacao.tipo == 'transferencia_enviada' %}
+                                                <i class="bi bi-arrow-up text-white"></i>
+                                            {% elif transacao.tipo == 'transferencia_recebida' %}
+                                                <i class="bi bi-arrow-down text-white"></i>
+                                            {% elif transacao.tipo == 'compra' %}
+                                                <i class="bi bi-bag text-white"></i>
+                                            {% else %}
+                                                <i class="bi bi-currency-dollar text-white"></i>
+                                            {% endif %}
                                         </div>
                                         <div>
-                                            <h6 class="mb-0">PIX Recebido</h6>
-                                            <small class="text-muted">João Silva - 24/09/2025 14:30</small>
+                                            <h6 class="mb-0">{{ transacao.get_tipo_display }}</h6>
+                                            <small class="text-muted">{{ transacao.data_transacao|date:"d/m/Y H:i" }}</small>
                                         </div>
                                     </div>
-                                    <span class="text-success fw-bold">+R$ 150,00</span>
+                                    <span class="fw-bold {% if transacao.eh_entrada %}text-success{% else %}text-danger{% endif %}">
+                                        {% if transacao.eh_entrada %}+{% else %}-{% endif %}R$ {{ transacao.valor|floatformat:2 }}
+                                    </span>
                                 </div>
-                                <div class="list-group-item d-flex justify-content-between align-items-center">
-                                    <div class="d-flex align-items-center">
-                                        <div class="bg-danger rounded-circle p-2 me-3">
-                                            <i class="bi bi-arrow-up text-white"></i>
-                                        </div>
-                                        <div>
-                                            <h6 class="mb-0">Compra no Débito</h6>
-                                            <small class="text-muted">Supermercado ABC - 24/09/2025 10:15</small>
-                                        </div>
-                                    </div>
-                                    <span class="text-danger fw-bold">-R$ 89,50</span>
-                                </div>
-                                <div class="list-group-item d-flex justify-content-between align-items-center">
-                                    <div class="d-flex align-items-center">
-                                        <div class="bg-primary rounded-circle p-2 me-3">
-                                            <i class="bi bi-graph-up text-white"></i>
-                                        </div>
-                                        <div>
-                                            <h6 class="mb-0">Rendimento CDB</h6>
-                                            <small class="text-muted">Investimento Galaxy - 23/09/2025 18:00</small>
-                                        </div>
-                                    </div>
-                                    <span class="text-success fw-bold">+R$ 45,20</span>
-                                </div>
+                                {% endfor %}
                             </div>
+                            <div class="text-center mt-3">
+                                <a href="{% url 'usuarios:extrato' %}" class="btn btn-outline-primary btn-sm">
+                                    <i class="bi bi-list-check"></i> Ver Extrato Completo
+                                </a>
+                            </div>
+                            {% else %}
+                            <div class="text-center py-4">
+                                <i class="bi bi-inbox" style="font-size: 2rem; color: #ccc;"></i>
+                                <p class="text-muted mt-2 mb-3">Nenhuma transação ainda</p>
+                                <a href="{% url 'usuarios:deposito' %}" class="btn btn-success btn-sm me-2">
+                                    <i class="bi bi-plus-circle"></i> Fazer Depósito
+                                </a>
+                                <a href="{% url 'usuarios:transferencia' %}" class="btn btn-primary btn-sm">
+                                    <i class="bi bi-arrow-left-right"></i> Transferir
+                                </a>
+                            </div>
+                            {% endif %}
                         </div>
                     </div>
                 </div>

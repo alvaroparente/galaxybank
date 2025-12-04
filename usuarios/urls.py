@@ -20,5 +20,10 @@ urlpatterns = [
     path('perfil/', views.perfil_view, name='perfil'),
     path('perfil/editar/', views.perfil_editar, name='perfil_editar'),
     
+    # URLs de transações
+    path('transferencia/', views.transferencia, name='transferencia'),
+    path('deposito/', views.deposito, name='deposito'),
+    path('extrato/', views.extrato, name='extrato'),
+    
     path('', views.home_redirect, name='home_redirect'),
 ]

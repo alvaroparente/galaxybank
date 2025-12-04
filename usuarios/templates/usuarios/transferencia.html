@@ -1,0 +1,173 @@
+{% extends 'usuarios/base.html' %}
+
+{% block title %}Transferência - Galaxy Bank{% endblock %}
+
+{% block content %}
+<div class="row g-0">
+    <!-- Sidebar -->
+    <div class="col-md-3 col-lg-2 sidebar">
+        <div class="p-3">
+            <h6 class="text-muted mb-3">MENU CLIENTE</h6>
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'usuarios:dashboard_cliente' %}">
+                        <i class="bi bi-speedometer2"></i> Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'loja:home' %}">
+                        <i class="bi bi-shop"></i> Loja
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="#">
+                        <i class="bi bi-arrow-left-right"></i> Transferência
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'usuarios:deposito' %}">
+                        <i class="bi bi-wallet-fill"></i> Depósito
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'usuarios:extrato' %}">
+                        <i class="bi bi-list-check"></i> Extrato
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="col-md-9 col-lg-10 main-content">
+        <div class="p-4">
+            <!-- Header -->
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h2><i class="bi bi-arrow-left-right text-primary"></i> Transferência</h2>
+                    <p class="text-muted mb-0">Transfira dinheiro para outro cliente Galaxy Bank</p>
+                </div>
+                <div class="text-end">
+                    <small class="text-muted">Seu Saldo:</small><br>
+                    <h4 class="text-primary mb-0">R$ {{ cliente.saldo|floatformat:2 }}</h4>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="card shadow-sm">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="bi bi-send"></i> Dados da Transferência</h5>
+                        </div>
+                        <div class="card-body">
+                            <form method="post">
+                                {% csrf_token %}
+                                
+                                <div class="mb-3">
+                                    <label for="destinatario_cpf" class="form-label">CPF do Destinatário <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="destinatario_cpf" name="destinatario_cpf" 
+                                           placeholder="000.000.000-00" maxlength="11" required>
+                                    <div class="form-text">Apenas números, sem pontos ou traços</div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="valor" class="form-label">Valor <span class="text-danger">*</span></label>
+                                    <div class="input-group">
+                                        <span class="input-group-text">R$</span>
+                                        <input type="text" class="form-control" id="valor" name="valor" 
+                                               placeholder="0,00" required>
+                                    </div>
+                                    <div class="form-text">Valor máximo: R$ {{ cliente.saldo|floatformat:2 }}</div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <label for="descricao" class="form-label">Descrição (Opcional)</label>
+                                    <textarea class="form-control" id="descricao" name="descricao" rows="3" 
+                                              placeholder="Ex: Pagamento almoço, presente aniversário..."></textarea>
+                                </div>
+
+                                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                                    <a href="{% url 'usuarios:dashboard_cliente' %}" class="btn btn-secondary me-md-2">
+                                        <i class="bi bi-arrow-left"></i> Voltar
+                                    </a>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="bi bi-send"></i> Transferir
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="card shadow-sm">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="bi bi-info-circle"></i> Informações</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="alert alert-info">
+                                <h6><i class="bi bi-shield-check"></i> Transferência Segura</h6>
+                                <ul class="mb-0 small">
+                                    <li>Transferências são processadas instantaneamente</li>
+                                    <li>Confirme sempre os dados do destinatário</li>
+                                    <li>Limite máximo: seu saldo disponível</li>
+                                </ul>
+                            </div>
+
+                            <div class="alert alert-warning">
+                                <h6><i class="bi bi-exclamation-triangle"></i> Atenção</h6>
+                                <p class="mb-0 small">
+                                    Verifique cuidadosamente o CPF do destinatário. 
+                                    Transferências não podem ser canceladas.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Máscara para CPF
+document.getElementById('destinatario_cpf').addEventListener('input', function(e) {
+    let value = e.target.value.replace(/\D/g, '');
+    if (value.length > 11) value = value.substring(0, 11);
+    e.target.value = value;
+});
+
+// Máscara para valor
+document.getElementById('valor').addEventListener('input', function(e) {
+    let value = e.target.value.replace(/[^\d,]/g, '');
+    e.target.value = value;
+});
+
+// Validação do formulário
+document.querySelector('form').addEventListener('submit', function(e) {
+    const cpf = document.getElementById('destinatario_cpf').value;
+    const valor = document.getElementById('valor').value;
+    
+    if (cpf.length !== 11) {
+        e.preventDefault();
+        alert('CPF deve ter 11 dígitos');
+        return;
+    }
+    
+    if (!valor || valor === '0' || valor === '0,00') {
+        e.preventDefault();
+        alert('Informe um valor válido');
+        return;
+    }
+    
+    const valorFloat = parseFloat(valor.replace(',', '.'));
+    const saldoCliente = {{ cliente.saldo }};
+    
+    if (valorFloat > saldoCliente) {
+        e.preventDefault();
+        alert('Valor superior ao seu saldo disponível');
+        return;
+    }
+});
+</script>
+{% endblock %}
