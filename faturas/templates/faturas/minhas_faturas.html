@@ -3,342 +3,245 @@
 {% block title %}Minhas Faturas - Galaxy Bank{% endblock %}
 
 {% block content %}
-<div class="container-fluid h-100">
-    <div class="row h-100">
-        <!-- Sidebar -->
-        <div class="col-md-3 col-lg-2 sidebar bg-dark">
-            <div class="position-sticky pt-3">
-                <ul class="nav flex-column">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'usuarios:dashboard_cliente' %}">
-                            <i class="bi bi-speedometer2"></i> Dashboard
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" href="{% url 'faturas:minhas_faturas' %}">
-                            <i class="bi bi-receipt"></i> Minhas Faturas
-                        </a>
-                    </li>
-                </ul>
+<div class="row g-0">
+    <!-- Sidebar -->
+    <div class="col-md-3 col-lg-2 sidebar">
+        <h6>NAVEGAÇÃO</h6>
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'usuarios:dashboard_cliente' %}">
+                    <i class="bi bi-speedometer2"></i> Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link active" href="#">
+                    <i class="bi bi-receipt"></i> Minhas Faturas
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'faturas:fatura_atual' %}">
+                    <i class="bi bi-calendar-check"></i> Fatura Atual
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="col-md-9 col-lg-10 main-content">
+        <!-- Header -->
+        <div class="dashboard-header animate-fadein mb-4">
+            <div>
+                <h1><i class="bi bi-receipt-cutoff" style="color: var(--galaxy-warning);"></i> Minhas Faturas</h1>
+                <p class="text-muted mb-0">Gerencie todas as suas faturas</p>
             </div>
         </div>
 
-        <!-- Main content -->
-        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                <h1 class="h2">
-                    <i class="bi bi-receipt"></i> Minhas Faturas
-                </h1>
-                <div class="btn-toolbar mb-2 mb-md-0">
-                    <div class="btn-group me-2">
-                        <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
-                            Filtrar Status
-                        </button>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="?status=">Todas</a></li>
-                            <li><a class="dropdown-item" href="?status=pendente">Pendentes</a></li>
-                            <li><a class="dropdown-item" href="?status=paga">Pagas</a></li>
-                            <li><a class="dropdown-item" href="?status=vencida">Vencidas</a></li>
-                            <li><a class="dropdown-item" href="?status=cancelada">Canceladas</a></li>
-                        </ul>
-                    </div>
+        <!-- Filtros -->
+        <div class="card filter-card animate-fadein mb-4" style="animation-delay: 0.1s;">
+            <div class="card-body">
+                <div class="btn-group" role="group">
+                    <a href="?status=" class="btn {% if not request.GET.status %}btn-primary{% else %}btn-outline-primary{% endif %}">
+                        Todas
+                    </a>
+                    <a href="?status=pendente" class="btn {% if request.GET.status == 'pendente' %}btn-warning{% else %}btn-outline-warning{% endif %}">
+                        Pendentes
+                    </a>
+                    <a href="?status=paga" class="btn {% if request.GET.status == 'paga' %}btn-success{% else %}btn-outline-success{% endif %}">
+                        Pagas
+                    </a>
+                    <a href="?status=cancelada" class="btn {% if request.GET.status == 'cancelada' %}btn-secondary{% else %}btn-outline-secondary{% endif %}">
+                        Canceladas
+                    </a>
                 </div>
             </div>
+        </div>
 
-            <!-- Resumo Financeiro -->
-            <div class="row mb-4">
-                <div class="col-md-3">
-                    <div class="card text-center border-warning">
-                        <div class="card-body">
-                            <h5 class="card-title text-warning">R$ {{ total_pendente|floatformat:2 }}</h5>
-                            <p class="card-text">Total em Aberto</p>
-                        </div>
+        <!-- Stats Cards -->
+        <div class="row g-4 mb-4">
+            <div class="col-md-6 col-lg-3 animate-fadein" style="animation-delay: 0.2s;">
+                <div class="stats-card">
+                    <div class="stats-icon" style="background: var(--gradient-warning);">
+                        <i class="bi bi-hourglass-split"></i>
                     </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card text-center border-danger">
-                        <div class="card-body">
-                            <h5 class="card-title text-danger">R$ {{ total_vencido|floatformat:2 }}</h5>
-                            <p class="card-text">Total Vencido</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card text-center border-success">
-                        <div class="card-body">
-                            <h5 class="card-title text-success">R$ {{ total_pago|floatformat:2 }}</h5>
-                            <p class="card-text">Total Pago</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card text-center border-info">
-                        <div class="card-body">
-                            <h5 class="card-title text-info">{{ faturas_count }}</h5>
-                            <p class="card-text">Total de Faturas</p>
-                        </div>
-                    </div>
+                    <div class="stats-value" style="color: var(--galaxy-warning);">R$ {{ total_pendente|floatformat:2 }}</div>
+                    <div class="stats-label">Total em Aberto</div>
                 </div>
             </div>
+            <div class="col-md-6 col-lg-3 animate-fadein" style="animation-delay: 0.3s;">
+                <div class="stats-card">
+                    <div class="stats-icon" style="background: var(--gradient-error);">
+                        <i class="bi bi-exclamation-triangle"></i>
+                    </div>
+                    <div class="stats-value" style="color: var(--galaxy-error);">R$ {{ total_vencido|floatformat:2 }}</div>
+                    <div class="stats-label">Total Vencido</div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3 animate-fadein" style="animation-delay: 0.4s;">
+                <div class="stats-card">
+                    <div class="stats-icon" style="background: var(--gradient-success);">
+                        <i class="bi bi-check-circle"></i>
+                    </div>
+                    <div class="stats-value" style="color: var(--galaxy-success);">R$ {{ total_pago|floatformat:2 }}</div>
+                    <div class="stats-label">Total Pago</div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3 animate-fadein" style="animation-delay: 0.5s;">
+                <div class="stats-card">
+                    <div class="stats-icon" style="background: var(--gradient-secondary);">
+                        <i class="bi bi-files"></i>
+                    </div>
+                    <div class="stats-value" style="color: var(--galaxy-secondary);">{{ faturas_count }}</div>
+                    <div class="stats-label">Total de Faturas</div>
+                </div>
+            </div>
+        </div>
 
-            {% if faturas %}
-            <!-- Lista de Faturas -->
-            <div class="row">
-                {% for fatura in faturas %}
-                <div class="col-12 mb-4">
-                    <div class="card {% if fatura.status == 'vencida' %}border-danger{% elif fatura.status == 'pendente' %}border-warning{% elif fatura.status == 'paga' %}border-success{% endif %}">
-                        <div class="card-header d-flex justify-content-between align-items-center">
-                            <div>
-                                <strong>Fatura #{{ fatura.id }}</strong>
-                                <span class="text-muted ms-2">{{ fatura.data_emissao|date:"d/m/Y" }}</span>
-                            </div>
-                            <div>
-                                {% if fatura.status == 'pendente' %}
-                                    {% if fatura.esta_vencida %}
-                                        <span class="badge bg-danger">Vencida</span>
-                                    {% else %}
-                                        <span class="badge bg-warning">Pendente</span>
-                                    {% endif %}
-                                {% elif fatura.status == 'paga' %}
-                                    <span class="badge bg-success">Paga</span>
-                                {% elif fatura.status == 'cancelada' %}
-                                    <span class="badge bg-secondary">Cancelada</span>
+        <!-- Lista de Faturas -->
+        {% if faturas %}
+        <div class="row g-4">
+            {% for fatura in faturas %}
+            <div class="col-12 animate-fadein" style="animation-delay: {{ forloop.counter|add:5|floatformat:1|mul:"0.1" }}s;">
+                <div class="card fatura-card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="mb-0">Fatura #{{ fatura.id }}</h5>
+                            <small class="text-muted">Emissão: {{ fatura.data_emissao|date:"d/m/Y" }}</small>
+                        </div>
+                        <div>
+                            {% if fatura.status == 'pendente' %}
+                                {% if fatura.esta_vencida %}
+                                    <span class="badge" style="background: var(--gradient-error); font-size: 14px; padding: 8px 16px;">
+                                        <i class="bi bi-exclamation-circle"></i> Vencida
+                                    </span>
+                                {% else %}
+                                    <span class="badge" style="background: var(--gradient-warning); font-size: 14px; padding: 8px 16px;">
+                                        <i class="bi bi-clock"></i> Pendente
+                                    </span>
                                 {% endif %}
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <h6>Informações da Fatura</h6>
-                                    <p><strong>Valor Total:</strong> R$ {{ fatura.valor_total|floatformat:2 }}</p>
-                                    <p><strong>Número de Parcelas:</strong> {{ fatura.numero_parcelas }}x</p>
-                                    <p><strong>Data de Vencimento:</strong> {{ fatura.data_vencimento|date:"d/m/Y" }}</p>
-                                    {% if fatura.compra %}
-                                    <p><strong>Referente à Compra:</strong> #{{ fatura.compra.id }}</p>
-                                    {% endif %}
-                                </div>
-                                <div class="col-md-6">
-                                    <h6>Status dos Pagamentos</h6>
-                                    <div class="progress mb-3">
-                                        <div class="progress-bar {% if fatura.percentual_pago == 100 %}bg-success{% elif fatura.percentual_pago > 0 %}bg-warning{% else %}bg-danger{% endif %}" 
-                                             style="width: {{ fatura.percentual_pago }}%">
-                                            {{ fatura.percentual_pago|floatformat:1 }}%
-                                        </div>
-                                    </div>
-                                    <p><strong>Pago:</strong> R$ {{ fatura.valor_pago|floatformat:2 }}</p>
-                                    <p><strong>Restante:</strong> R$ {{ fatura.saldo_devedor|floatformat:2 }}</p>
-                                </div>
-                            </div>
-                            
-                            <!-- Parcelas -->
-                            {% if fatura.pagamentos.exists %}
-                            <div class="row mt-3">
-                                <div class="col-12">
-                                    <h6>Parcelas</h6>
-                                    <div class="table-responsive">
-                                        <table class="table table-sm">
-                                            <thead>
-                                                <tr>
-                                                    <th>Parcela</th>
-                                                    <th>Valor</th>
-                                                    <th>Vencimento</th>
-                                                    <th>Status</th>
-                                                    <th>Data Pagamento</th>
-                                                    <th>Ações</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {% for pagamento in fatura.pagamentos.all|slice:":5" %}
-                                                <tr>
-                                                    <td>{{ pagamento.numero_parcela }}/{{ fatura.numero_parcelas }}</td>
-                                                    <td>R$ {{ pagamento.valor_parcela|floatformat:2 }}</td>
-                                                    <td>{{ pagamento.data_vencimento|date:"d/m/Y" }}</td>
-                                                    <td>
-                                                        {% if pagamento.pago %}
-                                                            <span class="badge bg-success">Paga</span>
-                                                        {% elif pagamento.esta_vencida %}
-                                                            <span class="badge bg-danger">Vencida</span>
-                                                        {% else %}
-                                                            <span class="badge bg-warning">Pendente</span>
-                                                        {% endif %}
-                                                    </td>
-                                                    <td>
-                                                        {% if pagamento.data_pagamento %}
-                                                            {{ pagamento.data_pagamento|date:"d/m/Y" }}
-                                                        {% else %}
-                                                            -
-                                                        {% endif %}
-                                                    </td>
-                                                    <td>
-                                                        {% if not pagamento.pago %}
-                                                        <button class="btn btn-sm btn-success" onclick="pagarParcela({{ pagamento.id }})">
-                                                            <i class="bi bi-credit-card"></i>
-                                                        </button>
-                                                        {% endif %}
-                                                    </td>
-                                                </tr>
-                                                {% endfor %}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                    {% if fatura.pagamentos.count > 5 %}
-                                    <p class="text-muted small">E mais {{ fatura.pagamentos.count|add:"-5" }} parcela{{ fatura.pagamentos.count|add:"-5"|pluralize }}...</p>
-                                    {% endif %}
-                                </div>
-                            </div>
+                            {% elif fatura.status == 'paga' %}
+                                <span class="badge" style="background: var(--gradient-success); font-size: 14px; padding: 8px 16px;">
+                                    <i class="bi bi-check-circle"></i> Paga
+                                </span>
+                            {% elif fatura.status == 'cancelada' %}
+                                <span class="badge bg-secondary" style="font-size: 14px; padding: 8px 16px;">
+                                    <i class="bi bi-x-circle"></i> Cancelada
+                                </span>
                             {% endif %}
                         </div>
-                        
-                        <div class="card-footer bg-transparent">
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    {% if fatura.esta_vencida %}
-                                    <small class="text-danger">
-                                        <i class="bi bi-exclamation-triangle"></i> 
-                                        Vencida há {{ fatura.dias_em_atraso }} dia{{ fatura.dias_em_atraso|pluralize }}
-                                    </small>
-                                    {% elif fatura.status == 'pendente' %}
-                                    <small class="text-warning">
-                                        <i class="bi bi-clock"></i> 
-                                        Vence em {{ fatura.dias_para_vencimento }} dia{{ fatura.dias_para_vencimento|pluralize }}
-                                    </small>
-                                    {% elif fatura.status == 'paga' %}
-                                    <small class="text-success">
-                                        <i class="bi bi-check-circle"></i> Fatura quitada
-                                    </small>
-                                    {% endif %}
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <div class="info-group">
+                                    <label><i class="bi bi-currency-dollar"></i> Valor Total</label>
+                                    <div class="info-value">R$ {{ fatura.valor_total|floatformat:2 }}</div>
                                 </div>
-                                <div>
-                                    {% if fatura.status == 'pendente' %}
-                                    <button class="btn btn-sm btn-success me-2" onclick="pagarFaturaCompleta({{ fatura.id }})">
-                                        <i class="bi bi-credit-card"></i> Pagar Tudo
-                                    </button>
-                                    {% endif %}
-                                    <a href="{% url 'faturas:detalhes_fatura' fatura.id %}" class="btn btn-sm btn-outline-primary">
-                                        <i class="bi bi-eye"></i> Ver Detalhes
-                                    </a>
+                                <div class="info-group">
+                                    <label><i class="bi bi-calendar-event"></i> Vencimento</label>
+                                    <div class="info-value">{{ fatura.data_vencimento|date:"d/m/Y" }}</div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label><i class="bi bi-graph-up"></i> Progresso do Pagamento</label>
+                                <div class="progress-modern mb-2" style="height: 32px;">
+                                    <div class="progress-bar-modern" 
+                                         style="width: {{ fatura.percentual_pago }}%; 
+                                                background: {% if fatura.percentual_pago == 100 %}var(--gradient-success){% elif fatura.percentual_pago > 0 %}var(--gradient-warning){% else %}var(--gradient-error){% endif %};">
+                                        <span>{{ fatura.percentual_pago|floatformat:0 }}%</span>
+                                    </div>
+                                </div>
+                                <div class="d-flex justify-content-between">
+                                    <small class="text-success">Pago: R$ {{ fatura.valor_pago|floatformat:2 }}</small>
+                                    <small class="text-danger">Restante: R$ {{ fatura.saldo_devedor|floatformat:2 }}</small>
                                 </div>
                             </div>
                         </div>
+                        <div class="mt-3 text-end">
+                            <a href="{% url 'faturas:detalhes_fatura' fatura.id %}" class="btn btn-outline-primary">
+                                <i class="bi bi-eye"></i> Ver Detalhes
+                            </a>
+                            {% if fatura.status == 'pendente' %}
+                            <button class="btn btn-success" onclick="pagarFatura({{ fatura.id }})">
+                                <i class="bi bi-credit-card"></i> Pagar Agora
+                            </button>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
-                {% endfor %}
             </div>
-
-            <!-- Paginação -->
-            {% if is_paginated %}
-            <nav aria-label="Paginação">
-                <ul class="pagination justify-content-center">
-                    {% if page_obj.has_previous %}
-                    <li class="page-item">
-                        <a class="page-link" href="?page=1{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}">Primeira</a>
-                    </li>
-                    <li class="page-item">
-                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}">Anterior</a>
-                    </li>
-                    {% endif %}
-                    
-                    <li class="page-item active">
-                        <span class="page-link">{{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
-                    </li>
-                    
-                    {% if page_obj.has_next %}
-                    <li class="page-item">
-                        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}">Próxima</a>
-                    </li>
-                    <li class="page-item">
-                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}">Última</a>
-                    </li>
-                    {% endif %}
-                </ul>
-            </nav>
-            {% endif %}
-
-            {% else %}
-            <!-- Nenhuma Fatura -->
-            <div class="text-center py-5">
-                <i class="bi bi-receipt" style="font-size: 4rem; color: #ccc;"></i>
-                <h3 class="mt-3">Nenhuma fatura encontrada</h3>
-                {% if request.GET.status %}
-                <p class="text-muted">Não há faturas com o status "{{ request.GET.status }}".</p>
-                <a href="{% url 'faturas:minhas_faturas' %}" class="btn btn-outline-primary">Ver Todas as Faturas</a>
-                {% else %}
-                <p class="text-muted">
-                    Suas faturas aparecerão aqui quando você fizer compras parceladas.<br>
-                    <small class="text-info">Debug: Total faturas = {{ faturas_count }}</small>
-                </p>
-                <div class="mt-3">
-                    <a href="{% url 'loja:produtos' %}" class="btn btn-primary btn-lg me-2">
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="card animate-fadein">
+            <div class="card-body">
+                <div class="empty-state">
+                    <div class="empty-state-icon">
+                        <i class="bi bi-receipt"></i>
+                    </div>
+                    <h5 class="empty-state-title">Nenhuma fatura encontrada</h5>
+                    <p class="empty-state-text">Você ainda não possui faturas cadastradas.</p>
+                    <a href="{% url 'loja:produtos' %}" class="btn btn-primary">
                         <i class="bi bi-shop"></i> Ir às Compras
                     </a>
-                    <a href="{% url 'faturas:fatura_atual' %}" class="btn btn-outline-primary btn-lg">
-                        <i class="bi bi-receipt"></i> Ver Fatura Atual
-                    </a>
                 </div>
-                {% endif %}
             </div>
-            {% endif %}
-        </main>
+        </div>
+        {% endif %}
     </div>
 </div>
 
-<script>
-function pagarParcela(pagamentoId) {
-    showConfirmNotification(
-        'Deseja pagar esta parcela usando seu saldo?',
-        function() {
-            showInfoNotification('Processando pagamento...', 2000);
-            fetch(`/faturas/pagar-parcela/${pagamentoId}/`, {
-                method: 'POST',
-                headers: {
-                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
-                    'Content-Type': 'application/json',
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    showSuccessNotification('Pagamento realizado com sucesso!');
-                    setTimeout(() => location.reload(), 1500);
-                } else {
-                    showErrorNotification('Erro ao processar pagamento: ' + data.message);
-                }
-            })
-            .catch(error => {
-                console.error('Erro:', error);
-                showErrorNotification('Erro ao processar pagamento.');
-            });
-        }
-    );
+<style>
+.fatura-card {
+    transition: all 0.3s ease;
 }
 
-function pagarFaturaCompleta(faturaId) {
-    showConfirmNotification(
-        'Deseja quitar toda a fatura usando seu saldo?',
-        function() {
-            showInfoNotification('Processando pagamento da fatura...', 2000);
-            fetch(`/faturas/pagar-fatura-completa/${faturaId}/`, {
-                method: 'POST',
-                headers: {
-                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
-                    'Content-Type': 'application/json',
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    showSuccessNotification('Fatura quitada com sucesso!');
-                    setTimeout(() => location.reload(), 1500);
-                } else {
-                    showErrorNotification('Erro ao processar pagamento: ' + data.message);
-                }
-            })
-            .catch(error => {
-                console.error('Erro:', error);
-                showErrorNotification('Erro ao processar pagamento.');
-            });
-        }
-    );
+.fatura-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-xl);
+}
+
+.info-group {
+    margin-bottom: 16px;
+}
+
+.info-group label {
+    font-size: 13px;
+    color: var(--galaxy-text-secondary);
+    font-weight: 600;
+    display: block;
+    margin-bottom: 4px;
+}
+
+.info-value {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--galaxy-text);
+}
+
+.progress-modern {
+    background: var(--galaxy-border);
+    border-radius: var(--radius-full);
+    overflow: hidden;
+}
+
+.progress-bar-modern {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    color: white;
+    font-weight: 700;
+    font-size: 14px;
+    transition: width 0.6s ease;
+}
+</style>
+
+<script>
+function pagarFatura(faturaId) {
+    if (confirm('Deseja pagar esta fatura?')) {
+        // Implementar lógica de pagamento
+        window.location.href = `/faturas/${faturaId}/pagar/`;
+    }
 }
 </script>
 {% endblock %}

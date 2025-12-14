@@ -4,188 +4,317 @@
 
 {% block content %}
 <div class="row g-0">
-    <!-- Sidebar -->
+    <!-- Sidebar Moderna -->
     <div class="col-md-3 col-lg-2 sidebar">
-        <div class="p-3">
-            <h6 class="text-muted mb-3">MENU CLIENTE</h6>
-            <ul class="nav flex-column">
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'usuarios:dashboard_cliente' %}">
-                        <i class="bi bi-speedometer2"></i> Dashboard
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'usuarios:transferencia' %}">
-                        <i class="bi bi-arrow-left-right"></i> Transferência
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'usuarios:deposito' %}">
-                        <i class="bi bi-wallet-fill"></i> Depósito
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link active" href="#">
-                        <i class="bi bi-list-check"></i> Extrato
-                    </a>
-                </li>
-            </ul>
-        </div>
+        <h6>NAVEGAÇÃO</h6>
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'usuarios:dashboard_cliente' %}">
+                    <i class="bi bi-speedometer2"></i> Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'usuarios:transferencia' %}">
+                    <i class="bi bi-arrow-left-right"></i> Transferência
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'usuarios:deposito' %}">
+                    <i class="bi bi-wallet-fill"></i> Depósito
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link active" href="#">
+                    <i class="bi bi-list-check"></i> Extrato
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'usuarios:perfil' %}">
+                    <i class="bi bi-person"></i> Perfil
+                </a>
+            </li>
+        </ul>
     </div>
 
     <!-- Main Content -->
     <div class="col-md-9 col-lg-10 main-content">
-        <div class="p-4">
-            <!-- Header -->
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <div>
-                    <h2><i class="bi bi-list-check text-info"></i> Extrato de Transações</h2>
-                    <p class="text-muted mb-0">Histórico das suas movimentações</p>
+        <!-- Header Moderno -->
+        <div class="dashboard-header animate-fadein mb-4">
+            <div>
+                <h1><i class="bi bi-graph-up" style="color: var(--galaxy-secondary);"></i> Extrato</h1>
+                <p class="text-muted mb-0">Análise completa das suas transações</p>
+            </div>
+            <div class="text-end">
+                <small class="text-muted d-block">Saldo Atual</small>
+                <h3 style="color: var(--galaxy-primary); font-weight: 800;">R$ {{ cliente.saldo|floatformat:2 }}</h3>
+            </div>
+        </div>
+
+        <!-- Filtros Modernos -->
+        <div class="card filter-card animate-fadein mb-4" style="animation-delay: 0.1s;">
+            <div class="card-body">
+                <form method="get" class="row g-3 align-items-end">
+                    <div class="col-md-4">
+                        <label class="form-label"><i class="bi bi-calendar-range"></i> Período</label>
+                        <select name="periodo" class="form-select">
+                            <option value="7" {% if periodo_selecionado == '7' %}selected{% endif %}>Últimos 7 dias</option>
+                            <option value="30" {% if periodo_selecionado == '30' %}selected{% endif %}>Últimos 30 dias</option>
+                            <option value="90" {% if periodo_selecionado == '90' %}selected{% endif %}>Últimos 90 dias</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label"><i class="bi bi-filter"></i> Tipo de Transação</label>
+                        <select name="tipo" class="form-select">
+                            <option value="todas" {% if tipo_selecionado == 'todas' %}selected{% endif %}>Todas</option>
+                            <option value="deposito" {% if tipo_selecionado == 'deposito' %}selected{% endif %}>Depósitos</option>
+                            <option value="transferencia_enviada" {% if tipo_selecionado == 'transferencia_enviada' %}selected{% endif %}>Transferências Enviadas</option>
+                            <option value="transferencia_recebida" {% if tipo_selecionado == 'transferencia_recebida' %}selected{% endif %}>Transferências Recebidas</option>
+                            <option value="compra" {% if tipo_selecionado == 'compra' %}selected{% endif %}>Compras</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-funnel-fill"></i> Aplicar Filtros
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Cards de Resumo -->
+        <div class="row g-4 mb-4">
+            <div class="col-md-6 col-lg-3 animate-fadein" style="animation-delay: 0.2s;">
+                <div class="stats-card">
+                    <div class="stats-icon" style="background: var(--gradient-success);">
+                        <i class="bi bi-arrow-down-circle"></i>
+                    </div>
+                    <div class="stats-value" style="color: var(--galaxy-success);">R$ {{ total_entrada|floatformat:2 }}</div>
+                    <div class="stats-label">Total Entradas</div>
                 </div>
-                <div class="text-end">
-                    <small class="text-muted">Saldo Atual:</small><br>
-                    <h4 class="text-primary mb-0">R$ {{ cliente.saldo|floatformat:2 }}</h4>
+            </div>
+            <div class="col-md-6 col-lg-3 animate-fadein" style="animation-delay: 0.3s;">
+                <div class="stats-card">
+                    <div class="stats-icon" style="background: var(--gradient-error);">
+                        <i class="bi bi-arrow-up-circle"></i>
+                    </div>
+                    <div class="stats-value" style="color: var(--galaxy-error);">R$ {{ total_saida|floatformat:2 }}</div>
+                    <div class="stats-label">Total Saídas</div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3 animate-fadein" style="animation-delay: 0.4s;">
+                <div class="stats-card">
+                    <div class="stats-icon" style="background: {% if saldo_periodo >= 0 %}var(--gradient-success){% else %}var(--gradient-error){% endif %};">
+                        <i class="bi bi-cash-stack"></i>
+                    </div>
+                    <div class="stats-value" style="color: {% if saldo_periodo >= 0 %}var(--galaxy-success){% else %}var(--galaxy-error){% endif %};">
+                        R$ {{ saldo_periodo|floatformat:2 }}
+                    </div>
+                    <div class="stats-label">Saldo do Período</div>
+                </div>
+            </div>
+            <div class="col-md-6 col-lg-3 animate-fadein" style="animation-delay: 0.5s;">
+                <div class="stats-card">
+                    <div class="stats-icon" style="background: var(--gradient-secondary);">
+                        <i class="bi bi-receipt"></i>
+                    </div>
+                    <div class="stats-value" style="color: var(--galaxy-secondary);">{{ transacoes.count }}</div>
+                    <div class="stats-label">Transações</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gráficos -->
+        {% if transacoes %}
+        <div class="row g-4 mb-4">
+            <!-- Gráfico de Evolução do Saldo -->
+            <div class="col-lg-8 animate-fadein" style="animation-delay: 0.6s;">
+                <div class="card chart-card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-graph-up-arrow"></i> Evolução do Saldo</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container" style="height: 300px;">
+                            <canvas id="saldoChart"></canvas>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Filtros -->
-            <div class="card mb-4 shadow-sm">
-                <div class="card-body">
-                    <form method="get" class="row align-items-end">
-                        <div class="col-md-3">
-                            <label class="form-label">Período</label>
-                            <select name="periodo" class="form-select">
-                                <option value="7" {% if periodo_selecionado == '7' %}selected{% endif %}>Últimos 7 dias</option>
-                                <option value="30" {% if periodo_selecionado == '30' %}selected{% endif %}>Últimos 30 dias</option>
-                                <option value="90" {% if periodo_selecionado == '90' %}selected{% endif %}>Últimos 90 dias</option>
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label">Tipo de Transação</label>
-                            <select name="tipo" class="form-select">
-                                <option value="todas" {% if tipo_selecionado == 'todas' %}selected{% endif %}>Todas</option>
-                                <option value="deposito" {% if tipo_selecionado == 'deposito' %}selected{% endif %}>Depósitos</option>
-                                <option value="transferencia_enviada" {% if tipo_selecionado == 'transferencia_enviada' %}selected{% endif %}>Transferências Enviadas</option>
-                                <option value="transferencia_recebida" {% if tipo_selecionado == 'transferencia_recebida' %}selected{% endif %}>Transferências Recebidas</option>
-                                <option value="compra" {% if tipo_selecionado == 'compra' %}selected{% endif %}>Compras</option>
-                            </select>
-                        </div>
-                        <div class="col-md-2">
-                            <button type="submit" class="btn btn-primary">
-                                <i class="bi bi-funnel"></i> Filtrar
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
-            <!-- Resumo do Período -->
-            <div class="row mb-4">
-                <div class="col-md-3">
-                    <div class="card text-center border-success">
-                        <div class="card-body">
-                            <h5 class="card-title text-success">R$ {{ total_entrada|floatformat:2 }}</h5>
-                            <p class="card-text">Total Entradas</p>
-                        </div>
+            <!-- Gráfico de Pizza - Categorias -->
+            <div class="col-lg-4 animate-fadein" style="animation-delay: 0.7s;">
+                <div class="card chart-card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-pie-chart-fill"></i> Por Categoria</h5>
                     </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card text-center border-danger">
-                        <div class="card-body">
-                            <h5 class="card-title text-danger">R$ {{ total_saida|floatformat:2 }}</h5>
-                            <p class="card-text">Total Saídas</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card text-center {% if saldo_periodo >= 0 %}border-success{% else %}border-danger{% endif %}">
-                        <div class="card-body">
-                            <h5 class="card-title {% if saldo_periodo >= 0 %}text-success{% else %}text-danger{% endif %}">
-                                R$ {{ saldo_periodo|floatformat:2 }}
-                            </h5>
-                            <p class="card-text">Saldo do Período</p>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card text-center border-info">
-                        <div class="card-body">
-                            <h5 class="card-title text-info">{{ transacoes.count }}</h5>
-                            <p class="card-text">Transações</p>
+                    <div class="card-body">
+                        <div class="chart-container" style="height: 300px;">
+                            <canvas id="categoriesChart"></canvas>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
+        {% endif %}
 
-            <!-- Lista de Transações -->
-            <div class="card shadow-sm">
-                <div class="card-header">
-                    <h5 class="mb-0"><i class="bi bi-clock-history"></i> Histórico de Transações</h5>
-                </div>
-                <div class="card-body p-0">
-                    {% if transacoes %}
-                        <div class="list-group list-group-flush">
-                            {% for transacao in transacoes %}
-                            <div class="list-group-item">
-                                <div class="d-flex justify-content-between align-items-start">
-                                    <div class="d-flex align-items-center">
-                                        <div class="rounded-circle p-2 me-3 {% if transacao.eh_entrada %}bg-success{% else %}bg-danger{% endif %}">
-                                            {% if transacao.tipo == 'deposito' %}
-                                                <i class="bi bi-plus-lg text-white"></i>
-                                            {% elif transacao.tipo == 'transferencia_enviada' %}
-                                                <i class="bi bi-arrow-up text-white"></i>
-                                            {% elif transacao.tipo == 'transferencia_recebida' %}
-                                                <i class="bi bi-arrow-down text-white"></i>
-                                            {% elif transacao.tipo == 'compra' %}
-                                                <i class="bi bi-bag text-white"></i>
-                                            {% else %}
-                                                <i class="bi bi-currency-dollar text-white"></i>
-                                            {% endif %}
-                                        </div>
-                                        <div>
-                                            <h6 class="mb-1">{{ transacao.get_tipo_display }}</h6>
-                                            <p class="mb-0 text-muted">{{ transacao.descricao }}</p>
-                                            <small class="text-muted">{{ transacao.data_transacao|date:"d/m/Y H:i" }}</small>
-                                        </div>
-                                    </div>
-                                    <div class="text-end">
-                                        <span class="fw-bold {% if transacao.eh_entrada %}text-success{% else %}text-danger{% endif %}">
-                                            {% if transacao.eh_entrada %}+{% else %}-{% endif %}R$ {{ transacao.valor|floatformat:2 }}
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        <div class="text-center py-5">
-                            <i class="bi bi-inbox" style="font-size: 3rem; color: #ccc;"></i>
-                            <h5 class="mt-3">Nenhuma transação encontrada</h5>
-                            <p class="text-muted">
-                                {% if tipo_selecionado != 'todas' %}
-                                    Não há transações do tipo "{{ tipo_selecionado }}" no período selecionado.
+        <!-- Lista de Transações -->
+        <div class="card transaction-card animate-fadein" style="animation-delay: 0.8s;">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-clock-history"></i> Histórico Detalhado</h5>
+            </div>
+            <div class="card-body p-0">
+                {% if transacoes %}
+                <div class="transaction-list">
+                    {% for transacao in transacoes %}
+                    <div class="transaction-item">
+                        <div class="d-flex align-items-center">
+                            <div class="transaction-icon {% if transacao.eh_entrada %}transaction-icon-success{% else %}transaction-icon-danger{% endif %}">
+                                {% if transacao.tipo == 'deposito' %}
+                                    <i class="bi bi-plus-lg"></i>
+                                {% elif transacao.tipo == 'transferencia_enviada' %}
+                                    <i class="bi bi-arrow-up-right"></i>
+                                {% elif transacao.tipo == 'transferencia_recebida' %}
+                                    <i class="bi bi-arrow-down-left"></i>
+                                {% elif transacao.tipo == 'compra' %}
+                                    <i class="bi bi-bag"></i>
                                 {% else %}
-                                    Não há transações no período selecionado.
+                                    <i class="bi bi-currency-dollar"></i>
                                 {% endif %}
-                            </p>
+                            </div>
+                            <div class="transaction-details">
+                                <div class="transaction-title">{{ transacao.get_tipo_display }}</div>
+                                <div class="transaction-description">{{ transacao.descricao }}</div>
+                                <div class="transaction-date">{{ transacao.data_transacao|date:"d/m/Y H:i" }}</div>
+                            </div>
                         </div>
-                    {% endif %}
+                        <div class="transaction-amount {% if transacao.eh_entrada %}transaction-amount-positive{% else %}transaction-amount-negative{% endif %}">
+                            {% if transacao.eh_entrada %}+{% else %}-{% endif %}R$ {{ transacao.valor|floatformat:2 }}
+                        </div>
+                    </div>
+                    {% endfor %}
                 </div>
+                {% else %}
+                <div class="empty-state">
+                    <div class="empty-state-icon">
+                        <i class="bi bi-inbox"></i>
+                    </div>
+                    <h5 class="empty-state-title">Nenhuma transação encontrada</h5>
+                    <p class="empty-state-text">
+                        {% if tipo_selecionado != 'todas' %}
+                            Não há transações do tipo selecionado no período informado.
+                        {% else %}
+                            Não há transações no período selecionado.
+                        {% endif %}
+                    </p>
+                </div>
+                {% endif %}
             </div>
+        </div>
 
-            <!-- Ações Rápidas -->
-            <div class="mt-4 text-center">
-                <a href="{% url 'usuarios:transferencia' %}" class="btn btn-primary me-2">
-                    <i class="bi bi-arrow-left-right"></i> Nova Transferência
-                </a>
-                <a href="{% url 'usuarios:deposito' %}" class="btn btn-success me-2">
-                    <i class="bi bi-plus-circle"></i> Fazer Depósito
-                </a>
-                <a href="{% url 'usuarios:dashboard_cliente' %}" class="btn btn-outline-secondary">
-                    <i class="bi bi-house"></i> Voltar ao Dashboard
-                </a>
-            </div>
+        <!-- Ações Rápidas -->
+        <div class="mt-4 text-center animate-fadein" style="animation-delay: 0.9s;">
+            <a href="{% url 'usuarios:transferencia' %}" class="btn btn-primary me-2">
+                <i class="bi bi-arrow-left-right"></i> Nova Transferência
+            </a>
+            <a href="{% url 'usuarios:deposito' %}" class="btn btn-success me-2">
+                <i class="bi bi-plus-circle"></i> Fazer Depósito
+            </a>
+            <a href="{% url 'usuarios:dashboard_cliente' %}" class="btn btn-outline-secondary">
+                <i class="bi bi-house"></i> Voltar ao Dashboard
+            </a>
         </div>
     </div>
 </div>
+
+<style>
+/* Estilos específicos do extrato */
+.filter-card {
+    background: var(--gradient-card);
+    border: 1px solid var(--galaxy-border);
+}
+
+.chart-card {
+    height: 100%;
+}
+
+.chart-container {
+    position: relative;
+    width: 100%;
+}
+
+.transaction-description {
+    font-size: 13px;
+    color: var(--galaxy-text-secondary);
+    margin-bottom: 2px;
+}
+</style>
+
+{% if transacoes %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Preparar dados das transações
+    const transacoes = [
+        {% for t in transacoes %}
+        {
+            data: '{{ t.data_transacao|date:"Y-m-d" }}',
+            valor: {{ t.valor }},
+            eh_entrada: {{ t.eh_entrada|lower }},
+            tipo: '{{ t.tipo }}'
+        }{% if not forloop.last %},{% endif %}
+        {% endfor %}
+    ];
+
+    // Agrupar por data e calcular saldo acumulado
+    const dadosPorData = {};
+    let saldoAtual = {{ cliente.saldo }} - {{ saldo_periodo }};
+    
+    transacoes.reverse().forEach(t => {
+        if (!dadosPorData[t.data]) {
+            dadosPorData[t.data] = saldoAtual;
+        }
+        saldoAtual += t.eh_entrada ? parseFloat(t.valor) : -parseFloat(t.valor);
+        dadosPorData[t.data] = saldoAtual;
+    });
+
+    const datasOrdenadas = Object.keys(dadosPorData).sort();
+    const saldos = datasOrdenadas.map(d => dadosPorData[d]);
+    const labels = datasOrdenadas.map(d => {
+        const date = new Date(d + 'T00:00:00');
+        return date.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' });
+    });
+
+    // Gráfico de Linha - Evolução do Saldo
+    if (labels.length > 0) {
+        GalaxyCharts.createLineChart('saldoChart', labels, saldos, {
+            label: 'Saldo',
+            showLegend: false
+        });
+    }
+
+    // Gráfico de Pizza - Por Categoria
+    const categorias = {
+        'Depósitos': 0,
+        'Transferências Enviadas': 0,
+        'Transferências Recebidas': 0,
+        'Compras': 0
+    };
+
+    transacoes.forEach(t => {
+        const valor = parseFloat(t.valor);
+        if (t.tipo === 'deposito') categorias['Depósitos'] += valor;
+        else if (t.tipo === 'transferencia_enviada') categorias['Transferências Enviadas'] += valor;
+        else if (t.tipo === 'transferencia_recebida') categorias['Transferências Recebidas'] += valor;
+        else if (t.tipo === 'compra') categorias['Compras'] += valor;
+    });
+
+    const categoriasLabels = Object.keys(categorias).filter(k => categorias[k] > 0);
+    const categoriasValores = categoriasLabels.map(k => categorias[k]);
+
+    if (categoriasLabels.length > 0) {
+        GalaxyCharts.createPieChart('categoriesChart', categoriasLabels, categoriasValores, {
+            showLegend: true
+        });
+    }
+});
+</script>
+{% endif %}
 {% endblock %}

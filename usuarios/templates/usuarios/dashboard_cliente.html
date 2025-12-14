@@ -4,221 +4,233 @@
 
 {% block content %}
 <div class="row g-0">
-    <!-- Sidebar -->
+    <!-- Sidebar Moderna -->
     <div class="col-md-3 col-lg-2 sidebar">
-        <div class="p-3">
-            <h6 class="text-muted mb-3">MENU CLIENTE</h6>
-            <ul class="nav flex-column">
-                <li class="nav-item">
-                    <a class="nav-link active" href="#">
-                        <i class="bi bi-speedometer2"></i> Dashboard
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'usuarios:transferencia' %}">
-                        <i class="bi bi-arrow-left-right"></i> Transferência
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'usuarios:deposito' %}">
-                        <i class="bi bi-wallet-fill"></i> Depósito
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'usuarios:extrato' %}">
-                        <i class="bi bi-list-check"></i> Extrato
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'loja:home' %}">
-                        <i class="bi bi-shop"></i> Loja
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'loja:compras' %}">
-                        <i class="bi bi-bag-check"></i> Minhas Compras
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'credito:solicitar' %}">
-                        <i class="bi bi-credit-card"></i> Solicitar Crédito
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'faturas:minhas_faturas' %}">
-                        <i class="bi bi-receipt"></i> Minhas Faturas
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'faturas:fatura_atual' %}">
-                        <i class="bi bi-calendar-check"></i> Fatura Atual
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{% url 'usuarios:perfil' %}">
-                        <i class="bi bi-person"></i> Perfil
-                    </a>
-                </li>
-            </ul>
-        </div>
+        <h6>NAVEGAÇÃO</h6>
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link active" href="#">
+                    <i class="bi bi-speedometer2"></i> Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'usuarios:transferencia' %}">
+                    <i class="bi bi-arrow-left-right"></i> Transferência
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'usuarios:deposito' %}">
+                    <i class="bi bi-wallet-fill"></i> Depósito
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'usuarios:extrato' %}">
+                    <i class="bi bi-list-check"></i> Extrato
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'loja:home' %}">
+                    <i class="bi bi-shop"></i> Loja
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'loja:compras' %}">
+                    <i class="bi bi-bag-check"></i> Minhas Compras
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'credito:solicitar' %}">
+                    <i class="bi bi-credit-card"></i> Solicitar Crédito
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'faturas:minhas_faturas' %}">
+                    <i class="bi bi-receipt"></i> Minhas Faturas
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'faturas:fatura_atual' %}">
+                    <i class="bi bi-calendar-check"></i> Fatura Atual
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'usuarios:perfil' %}">
+                    <i class="bi bi-person"></i> Perfil
+                </a>
+            </li>
+        </ul>
     </div>
 
     <!-- Main Content -->
     <div class="col-md-9 col-lg-10 main-content">
-        <div class="p-4">
-            <!-- Header -->
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <div>
-                    <h2>Olá, {{ cliente.usuario.first_name }}!</h2>
-                    <p class="text-muted mb-0">Bem-vindo ao seu Galaxy Bank</p>
-                </div>
-                <div class="text-end">
-                    <small class="text-muted">CPF: {{ cliente.cpf }}</small><br>
-                    <small class="text-muted">Pontos: {{ cliente.score_pontos }}</small>
+        <!-- Header Moderno -->
+        <div class="dashboard-header animate-fadein mb-4">
+            <div>
+                <h1 class="mb-2">Olá, {{ cliente.usuario.first_name }}! 👋</h1>
+                <p class="text-muted mb-0">Bem-vindo ao seu Galaxy Bank</p>
+            </div>
+            <div class="text-end">
+                <small class="text-muted d-block">CPF: {{ cliente.cpf }}</small>
+                <small class="text-muted d-block">Pontos: <span class="badge bg-gradient" style="background: var(--gradient-warning);">{{ cliente.score_pontos }}</span></small>
+            </div>
+        </div>
+
+        <!-- Cards de Estatísticas Modernos -->
+        <div class="row g-4 mb-4">
+            <div class="col-md-6 col-lg-3 animate-fadein" style="animation-delay: 0.1s;">
+                <div class="stats-card">
+                    <div class="stats-icon" style="background: var(--gradient-primary);">
+                        <i class="bi bi-wallet2"></i>
+                    </div>
+                    <div class="stats-value">R$ {{ cliente.saldo|floatformat:2 }}</div>
+                    <div class="stats-label">Saldo Disponível</div>
                 </div>
             </div>
-
-            <!-- Cards de Resumo -->
-            <div class="row mb-4">
-                <div class="col-md-3 mb-3">
-                    <div class="card stats-card border-0 shadow-sm">
-                        <div class="card-body text-center">
-                            <i class="bi bi-wallet text-primary fs-1"></i>
-                            <h5 class="card-title mt-2">Saldo Disponível</h5>
-                            <h3 class="text-primary">R$ {{ cliente.saldo|floatformat:2 }}</h3>
-                        </div>
+            <div class="col-md-6 col-lg-3 animate-fadein" style="animation-delay: 0.2s;">
+                <div class="stats-card">
+                    <div class="stats-icon" style="background: var(--gradient-success);">
+                        <i class="bi bi-arrow-up"></i>
                     </div>
-                </div>
-                <div class="col-md-3 mb-3">
-                    <div class="card stats-card border-0 shadow-sm">
-                        <div class="card-body text-center">
-                            <i class="bi bi-arrow-up text-success fs-1"></i>
-                            <h5 class="card-title mt-2">Recebido (Mês)</h5>
-                            <h3 class="text-success">R$ {{ total_recebido_mes|floatformat:2 }}</h3>
-                            <small class="text-muted">Entradas do mês</small>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3 mb-3">
-                    <div class="card stats-card border-0 shadow-sm">
-                        <div class="card-body text-center">
-                            <i class="bi bi-arrow-down text-danger fs-1"></i>
-                            <h5 class="card-title mt-2">Gasto (Mês)</h5>
-                            <h3 class="text-danger">R$ {{ total_gastos_mes|floatformat:2 }}</h3>
-                            <small class="text-muted">Saídas do mês</small>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3 mb-3">
-                    <div class="card stats-card border-0 shadow-sm">
-                        <div class="card-body text-center">
-                            <i class="bi bi-credit-card text-warning fs-1"></i>
-                            <h5 class="card-title mt-2">Limite Crédito</h5>
-                            {% if cliente.limite_credito_aprovado %}
-                                <h3 class="text-warning">R$ {{ cliente.limite_credito|floatformat:2 }}</h3>
-                                <small class="text-success"><i class="bi bi-check-circle"></i> Aprovado</small>
-                            {% else %}
-                                <h3 class="text-muted">R$ 0,00</h3>
-                                <small class="text-muted"><a href="{% url 'credito:solicitar' %}">Solicitar</a></small>
-                            {% endif %}
-                        </div>
-                    </div>
+                    <div class="stats-value" style="color: var(--galaxy-success);">R$ {{ total_recebido_mes|floatformat:2 }}</div>
+                    <div class="stats-label">Recebido este Mês</div>
                 </div>
             </div>
-
-            <!-- Ações Rápidas -->
-            <div class="card mb-4 shadow-sm">
-                <div class="card-header">
-                    <h5 class="mb-0"><i class="bi bi-lightning"></i> Ações Rápidas</h5>
+            <div class="col-md-6 col-lg-3 animate-fadein" style="animation-delay: 0.3s;">
+                <div class="stats-card">
+                    <div class="stats-icon" style="background: var(--gradient-error);">
+                        <i class="bi bi-arrow-down"></i>
+                    </div>
+                    <div class="stats-value" style="color: var(--galaxy-error);">R$ {{ total_gastos_mes|floatformat:2 }}</div>
+                    <div class="stats-label">Gasto este Mês</div>
                 </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-2 col-6 mb-3 text-center">
-                            <a href="{% url 'usuarios:transferencia' %}" class="btn btn-outline-primary btn-lg mb-2 w-100">
+            </div>
+            <div class="col-md-6 col-lg-3 animate-fadein" style="animation-delay: 0.4s;">
+                <div class="stats-card">
+                    <div class="stats-icon" style="background: var(--gradient-warning);">
+                        <i class="bi bi-credit-card"></i>
+                    </div>
+                    {% if cliente.limite_credito_aprovado %}
+                    <div class="stats-value" style="color: var(--galaxy-warning);">R$ {{ cliente.limite_credito|floatformat:2 }}</div>
+                    <div class="stats-label">Limite Aprovado ✓</div>
+                    {% else %}
+                    <div class="stats-value" style="color: var(--galaxy-text-secondary);">R$ 0,00</div>
+                    <div class="stats-label"><a href="{% url 'credito:solicitar' %}" style="color: var(--galaxy-primary);">Solicitar Crédito</a></div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Ações Rápidas Moderna -->
+        <div class="card quick-actions-card animate-fadein mb-4" style="animation-delay: 0.5s;">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-lightning-fill"></i> Ações Rápidas</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-6 col-md-4 col-lg-2">
+                        <a href="{% url 'usuarios:transferencia' %}" class="quick-action-btn">
+                            <div class="quick-action-icon" style="background: var(--gradient-primary);">
                                 <i class="bi bi-arrow-left-right"></i>
-                            </a>
-                            <small class="d-block">Transferência</small>
-                        </div>
-                        <div class="col-md-2 col-6 mb-3 text-center">
-                            <a href="{% url 'usuarios:deposito' %}" class="btn btn-outline-success btn-lg mb-2 w-100">
+                            </div>
+                            <span>Transferir</span>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-4 col-lg-2">
+                        <a href="{% url 'usuarios:deposito' %}" class="quick-action-btn">
+                            <div class="quick-action-icon" style="background: var(--gradient-success);">
                                 <i class="bi bi-wallet-fill"></i>
-                            </a>
-                            <small class="d-block">Depósito</small>
-                        </div>
-                        <div class="col-md-2 col-6 mb-3 text-center">
-                            <a href="{% url 'usuarios:extrato' %}" class="btn btn-outline-info btn-lg mb-2 w-100">
+                            </div>
+                            <span>Depositar</span>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-4 col-lg-2">
+                        <a href="{% url 'usuarios:extrato' %}" class="quick-action-btn">
+                            <div class="quick-action-icon" style="background: var(--gradient-secondary);">
                                 <i class="bi bi-list-check"></i>
-                            </a>
-                            <small class="d-block">Extrato</small>
-                        </div>
-                        <div class="col-md-2 col-6 mb-3 text-center">
-                            <a href="{% url 'loja:home' %}" class="btn btn-outline-warning btn-lg mb-2 w-100">
+                            </div>
+                            <span>Extrato</span>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-4 col-lg-2">
+                        <a href="{% url 'loja:home' %}" class="quick-action-btn">
+                            <div class="quick-action-icon" style="background: var(--gradient-warning);">
                                 <i class="bi bi-shop"></i>
-                            </a>
-                            <small class="d-block">Loja</small>
-                        </div>
-                        <div class="col-md-2 col-6 mb-3 text-center">
-                            <a href="{% url 'faturas:minhas_faturas' %}" class="btn btn-outline-danger btn-lg mb-2 w-100">
+                            </div>
+                            <span>Loja</span>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-4 col-lg-2">
+                        <a href="{% url 'faturas:minhas_faturas' %}" class="quick-action-btn">
+                            <div class="quick-action-icon" style="background: linear-gradient(135deg, #E91E63 0%, #FF5252 100%);">
                                 <i class="bi bi-receipt"></i>
-                            </a>
-                            <small class="d-block">Faturas</small>
-                        </div>
-                        <div class="col-md-2 col-6 mb-3 text-center">
-                            <a href="{% url 'credito:solicitar' %}" class="btn btn-outline-secondary btn-lg mb-2 w-100">
+                            </div>
+                            <span>Faturas</span>
+                        </a>
+                    </div>
+                    <div class="col-6 col-md-4 col-lg-2">
+                        <a href="{% url 'credito:solicitar' %}" class="quick-action-btn">
+                            <div class="quick-action-icon" style="background: linear-gradient(135deg, #667EEA 0%, #764BA2 100%);">
                                 <i class="bi bi-credit-card"></i>
-                            </a>
-                            <small class="d-block">Crédito</small>
-                        </div>
+                            </div>
+                            <span>Crédito</span>
+                        </a>
+                    </div>
                     </div>
                 </div>
             </div>
+        </div>
 
+        <!-- Grid de Conteúdo -->
+        <div class="row g-4">
             <!-- Últimas Transações -->
-            <div class="row">
-                <div class="col-md-8">
-                    <div class="card shadow-sm">
-                        <div class="card-header">
-                            <h5 class="mb-0"><i class="bi bi-clock-history"></i> Últimas Transações</h5>
-                        </div>
-                        <div class="card-body">
-                            {% if ultimas_transacoes %}
-                            <div class="list-group list-group-flush">
-                                {% for transacao in ultimas_transacoes %}
-                                <div class="list-group-item d-flex justify-content-between align-items-center">
-                                    <div class="d-flex align-items-center">
-                                        <div class="rounded-circle p-2 me-3 {% if transacao.eh_entrada %}bg-success{% else %}bg-danger{% endif %}">
-                                            {% if transacao.tipo == 'deposito' %}
-                                                <i class="bi bi-plus-lg text-white"></i>
-                                            {% elif transacao.tipo == 'transferencia_enviada' %}
-                                                <i class="bi bi-arrow-up text-white"></i>
-                                            {% elif transacao.tipo == 'transferencia_recebida' %}
-                                                <i class="bi bi-arrow-down text-white"></i>
-                                            {% elif transacao.tipo == 'compra' %}
-                                                <i class="bi bi-bag text-white"></i>
-                                            {% else %}
-                                                <i class="bi bi-currency-dollar text-white"></i>
-                                            {% endif %}
-                                        </div>
-                                        <div>
-                                            <h6 class="mb-0">{{ transacao.get_tipo_display }}</h6>
-                                            <small class="text-muted">{{ transacao.data_transacao|date:"d/m/Y H:i" }}</small>
-                                        </div>
+            <div class="col-lg-8 animate-fadein" style="animation-delay: 0.6s;">
+                <div class="card transaction-card">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-clock-history"></i> Últimas Transações</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        {% if ultimas_transacoes %}
+                        <div class="transaction-list">
+                            {% for transacao in ultimas_transacoes %}
+                            <div class="transaction-item">
+                                <div class="d-flex align-items-center">
+                                    <div class="transaction-icon {% if transacao.eh_entrada %}transaction-icon-success{% else %}transaction-icon-danger{% endif %}">
+                                        {% if transacao.tipo == 'deposito' %}
+                                            <i class="bi bi-plus-lg"></i>
+                                        {% elif transacao.tipo == 'transferencia_enviada' %}
+                                            <i class="bi bi-arrow-up-right"></i>
+                                        {% elif transacao.tipo == 'transferencia_recebida' %}
+                                            <i class="bi bi-arrow-down-left"></i>
+                                        {% elif transacao.tipo == 'compra' %}
+                                            <i class="bi bi-bag"></i>
+                                        {% else %}
+                                            <i class="bi bi-currency-dollar"></i>
+                                        {% endif %}
                                     </div>
-                                    <span class="fw-bold {% if transacao.eh_entrada %}text-success{% else %}text-danger{% endif %}">
-                                        {% if transacao.eh_entrada %}+{% else %}-{% endif %}R$ {{ transacao.valor|floatformat:2 }}
-                                    </span>
+                                    <div class="transaction-details">
+                                        <div class="transaction-title">{{ transacao.get_tipo_display }}</div>
+                                        <div class="transaction-date">{{ transacao.data_transacao|date:"d/m/Y H:i" }}</div>
+                                    </div>
                                 </div>
-                                {% endfor %}
+                                <div class="transaction-amount {% if transacao.eh_entrada %}transaction-amount-positive{% else %}transaction-amount-negative{% endif %}">
+                                    {% if transacao.eh_entrada %}+{% else %}-{% endif %}R$ {{ transacao.valor|floatformat:2 }}
+                                </div>
                             </div>
-                            <div class="text-center mt-3">
-                                <a href="{% url 'usuarios:extrato' %}" class="btn btn-outline-primary btn-sm">
-                                    <i class="bi bi-list-check"></i> Ver Extrato Completo
-                                </a>
+                            {% endfor %}
+                        </div>
+                        <div class="card-footer text-center">
+                            <a href="{% url 'usuarios:extrato' %}" class="btn btn-outline-primary btn-sm">
+                                Ver Extrato Completo <i class="bi bi-arrow-right"></i>
+                            </a>
+                        </div>
+                        {% else %}
+                        <div class="empty-state">
+                            <div class="empty-state-icon">
+                                <i class="bi bi-inbox"></i>
                             </div>
-                            {% else %}
-                            <div class="text-center py-4">
-                                <i class="bi bi-inbox" style="font-size: 2rem; color: #ccc;"></i>
-                                <p class="text-muted mt-2 mb-3">Nenhuma transação ainda</p>
+                            <h5 class="empty-state-title">Nenhuma transação ainda</h5>
+                            <p class="empty-state-text">Comece fazendo um depósito ou transferência</p>
+                            <div class="empty-state-actions">
                                 <a href="{% url 'usuarios:deposito' %}" class="btn btn-success btn-sm me-2">
                                     <i class="bi bi-plus-circle"></i> Fazer Depósito
                                 </a>
@@ -226,33 +238,264 @@
                                     <i class="bi bi-arrow-left-right"></i> Transferir
                                 </a>
                             </div>
-                            {% endif %}
                         </div>
+                        {% endif %}
                     </div>
                 </div>
+            </div>
 
-                <!-- Cartão Lateral -->
-                <div class="col-md-4">
-                    <div class="card shadow-sm">
-                        <div class="card-header">
-                            <h5 class="mb-0"><i class="bi bi-gift"></i> Ofertas Especiais</h5>
-                        </div>
-                        <div class="card-body">
-                            <div class="alert alert-info">
-                                <i class="bi bi-star"></i>
-                                <strong>Galaxy Premium</strong><br>
-                                <small>Upgrade sua conta e ganhe benefícios exclusivos!</small>
+            <!-- Cartão Lateral - Ofertas -->
+            <div class="col-lg-4 animate-fadein" style="animation-delay: 0.7s;">
+                <div class="card promo-card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0"><i class="bi bi-gift-fill"></i> Ofertas Especiais</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="promo-item" style="background: var(--gradient-secondary);">
+                            <div class="promo-icon">
+                                <i class="bi bi-star-fill"></i>
                             </div>
-                            <div class="alert alert-success">
+                            <div class="promo-content">
+                                <h6>Galaxy Premium</h6>
+                                <p>Upgrade sua conta e ganhe benefícios exclusivos!</p>
+                            </div>
+                        </div>
+                        <div class="promo-item" style="background: var(--gradient-success);">
+                            <div class="promo-icon">
                                 <i class="bi bi-percent"></i>
-                                <strong>CDB 12% a.a.</strong><br>
-                                <small>Invista já e faça seu dinheiro render!</small>
+                            </div>
+                            <div class="promo-content">
+                                <h6>CDB 12% a.a.</h6>
+                                <p>Invista já e faça seu dinheiro render!</p>
+                            </div>
+                        </div>
+                        <div class="promo-item" style="background: var(--gradient-warning);">
+                            <div class="promo-icon">
+                                <i class="bi bi-credit-card-fill"></i>
+                            </div>
+                            <div class="promo-content">
+                                <h6>Cashback 5%</h6>
+                                <p>Ganhe pontos em todas as compras!</p>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
+
+<style>
+/* Estilos específicos do dashboard moderno */
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.dashboard-header h1 {
+    font-size: 32px;
+    font-weight: 800;
+    color: var(--galaxy-text);
+}
+
+/* Quick Actions */
+.quick-actions-card {
+    overflow: visible;
+}
+
+.quick-action-btn {
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    border-radius: var(--radius-md);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    color: var(--galaxy-text);
+}
+
+.quick-action-btn:hover {
+    transform: translateY(-8px);
+}
+
+.quick-action-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 24px;
+    box-shadow: var(--shadow-colored);
+    transition: all 0.3s ease;
+}
+
+.quick-action-btn:hover .quick-action-icon {
+    transform: scale(1.1);
+    box-shadow: var(--shadow-xl);
+}
+
+.quick-action-btn span {
+    font-size: 13px;
+    font-weight: 600;
+}
+
+/* Transaction Card */
+.transaction-card {
+    overflow: hidden;
+}
+
+.transaction-list {
+    padding: 0;
+}
+
+.transaction-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 28px;
+    border-bottom: 1px solid var(--galaxy-border);
+    transition: all 0.3s ease;
+}
+
+.transaction-item:last-child {
+    border-bottom: none;
+}
+
+.transaction-item:hover {
+    background: var(--galaxy-light);
+    transform: translateX(8px);
+}
+
+.transaction-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    color: white;
+    margin-right: 16px;
+}
+
+.transaction-icon-success {
+    background: var(--gradient-success);
+}
+
+.transaction-icon-danger {
+    background: var(--gradient-error);
+}
+
+.transaction-details {
+    flex: 1;
+}
+
+.transaction-title {
+    font-weight: 600;
+    font-size: 15px;
+    color: var(--galaxy-text);
+    margin-bottom: 4px;
+}
+
+.transaction-date {
+    font-size: 13px;
+    color: var(--galaxy-text-secondary);
+}
+
+.transaction-amount {
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.transaction-amount-positive {
+    color: var(--galaxy-success);
+}
+
+.transaction-amount-negative {
+    color: var(--galaxy-error);
+}
+
+/* Empty State */
+.empty-state {
+    padding: 64px 32px;
+    text-align: center;
+}
+
+.empty-state-icon {
+    font-size: 64px;
+    color: var(--galaxy-border);
+    margin-bottom: 24px;
+}
+
+.empty-state-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--galaxy-text);
+    margin-bottom: 8px;
+}
+
+.empty-state-text {
+    color: var(--galaxy-text-secondary);
+    margin-bottom: 24px;
+}
+
+.empty-state-actions {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+}
+
+/* Promo Card */
+.promo-card .card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.promo-item {
+    padding: 20px;
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    color: white;
+    transition: all 0.3s ease;
+    box-shadow: var(--shadow-md);
+}
+
+.promo-item:hover {
+    transform: translateX(8px);
+    box-shadow: var(--shadow-xl);
+}
+
+.promo-icon {
+    width: 48px;
+    height: 48px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: var(--radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    flex-shrink: 0;
+}
+
+.promo-content h6 {
+    font-size: 16px;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.promo-content p {
+    font-size: 13px;
+    margin-bottom: 0;
+    opacity: 0.9;
+}
+</style>
 {% endblock %}

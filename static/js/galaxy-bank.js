@@ -93,8 +93,13 @@ function processDjangoMessages() {
 
 // Função principal para mostrar notificações
 function showNotification(message, type = 'info', duration = 5000, options = {}) {
+    console.log('showNotification chamada:', message, type);
     const container = document.querySelector('.galaxy-notifications-container');
-    if (!container) return;
+    console.log('Container encontrado:', container);
+    if (!container) {
+        console.error('Container de notificações não encontrado!');
+        return;
+    }
     
     // Configurações por tipo
     const config = {
@@ -190,6 +195,10 @@ function showNotification(message, type = 'info', duration = 5000, options = {})
 
 // Remover notificação com animação
 function removeNotification(notification) {
+    if (!notification || !notification.classList) {
+        console.warn('removeNotification chamado com argumento inválido:', notification);
+        return;
+    }
     notification.classList.add('hide');
     notification.classList.remove('show');
     setTimeout(() => {
