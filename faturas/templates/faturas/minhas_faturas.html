@@ -284,51 +284,61 @@
 
 <script>
 function pagarParcela(pagamentoId) {
-    if (confirm('Deseja pagar esta parcela usando seu saldo?')) {
-        fetch(`/faturas/pagar-parcela/${pagamentoId}/`, {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
-                'Content-Type': 'application/json',
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                location.reload();
-            } else {
-                alert('Erro ao processar pagamento: ' + data.message);
-            }
-        })
-        .catch(error => {
-            console.error('Erro:', error);
-            alert('Erro ao processar pagamento.');
-        });
-    }
+    showConfirmNotification(
+        'Deseja pagar esta parcela usando seu saldo?',
+        function() {
+            showInfoNotification('Processando pagamento...', 2000);
+            fetch(`/faturas/pagar-parcela/${pagamentoId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showSuccessNotification('Pagamento realizado com sucesso!');
+                    setTimeout(() => location.reload(), 1500);
+                } else {
+                    showErrorNotification('Erro ao processar pagamento: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Erro:', error);
+                showErrorNotification('Erro ao processar pagamento.');
+            });
+        }
+    );
 }
 
 function pagarFaturaCompleta(faturaId) {
-    if (confirm('Deseja quitar toda a fatura usando seu saldo?')) {
-        fetch(`/faturas/pagar-fatura-completa/${faturaId}/`, {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
-                'Content-Type': 'application/json',
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                location.reload();
-            } else {
-                alert('Erro ao processar pagamento: ' + data.message);
-            }
-        })
-        .catch(error => {
-            console.error('Erro:', error);
-            alert('Erro ao processar pagamento.');
-        });
-    }
+    showConfirmNotification(
+        'Deseja quitar toda a fatura usando seu saldo?',
+        function() {
+            showInfoNotification('Processando pagamento da fatura...', 2000);
+            fetch(`/faturas/pagar-fatura-completa/${faturaId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showSuccessNotification('Fatura quitada com sucesso!');
+                    setTimeout(() => location.reload(), 1500);
+                } else {
+                    showErrorNotification('Erro ao processar pagamento: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Erro:', error);
+                showErrorNotification('Erro ao processar pagamento.');
+            });
+        }
+    );
 }
 </script>
 {% endblock %}

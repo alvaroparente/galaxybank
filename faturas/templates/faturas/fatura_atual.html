@@ -359,28 +359,33 @@
 
 <script>
 function pagarFaturaCompleta() {
-    const saldoDevedor = {{ fatura.saldo_devedor }};
-    if (confirm(`Deseja pagar a fatura completa (R$ ${saldoDevedor.toFixed(2)}) usando seu saldo?`)) {
-        fetch(`/faturas/pagar-fatura-completa/{{ fatura.id }}/`, {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
-                'Content-Type': 'application/json',
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                location.reload();
-            } else {
-                alert('Erro ao processar pagamento: ' + data.message);
-            }
-        })
-        .catch(error => {
-            console.error('Erro:', error);
-            alert('Erro ao processar pagamento.');
-        });
-    }
+    const saldoDevedor = parseFloat('{{ fatura.saldo_devedor }}'.replace(',', '.'));
+    showConfirmNotification(
+        `Deseja pagar a fatura completa (R$ ${saldoDevedor.toFixed(2)}) usando seu saldo?`,
+        function() {
+            showInfoNotification('Processando pagamento...', 2000);
+            fetch(`/faturas/pagar-fatura-completa/{{ fatura.id }}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showSuccessNotification('Fatura paga com sucesso!');
+                    setTimeout(() => location.reload(), 1500);
+                } else {
+                    showErrorNotification('Erro ao processar pagamento: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Erro:', error);
+                showErrorNotification('Erro ao processar pagamento.');
+            });
+        }
+    );
 }
 
 // Configurar data mínima para vencimento (hoje + 1 dia)

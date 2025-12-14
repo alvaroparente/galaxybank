@@ -302,27 +302,32 @@
 
 <script>
 function cancelarPedido(pedidoId) {
-    if (confirm('Tem certeza que deseja cancelar este pedido?')) {
-        fetch(`/loja/cancelar-pedido/${pedidoId}/`, {
-            method: 'POST',
-            headers: {
-                'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
-                'Content-Type': 'application/json',
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                location.reload();
-            } else {
-                alert('Erro ao cancelar o pedido: ' + data.message);
-            }
-        })
-        .catch(error => {
-            console.error('Erro:', error);
-            alert('Erro ao cancelar o pedido.');
-        });
-    }
+    showConfirmNotification(
+        'Tem certeza que deseja cancelar este pedido?',
+        function() {
+            showInfoNotification('Processando cancelamento...', 2000);
+            fetch(`/loja/cancelar-pedido/${pedidoId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                    'Content-Type': 'application/json',
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showSuccessNotification('Pedido cancelado com sucesso!');
+                    setTimeout(() => location.reload(), 1500);
+                } else {
+                    showErrorNotification('Erro ao cancelar o pedido: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Erro:', error);
+                showErrorNotification('Erro ao cancelar o pedido.');
+            });
+        }
+    );
 }
 </script>
 {% endblock %}

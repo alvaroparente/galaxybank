@@ -41,6 +41,39 @@ Sistema de banco digital com autenticação para dois tipos de usuários: **Clie
 
 ## Funcionalidades Implementadas
 
+### Sistema de Notificações Personalizadas ⭐ NOVO
+- **Notificações elegantes e animadas** que substituem os alerts/confirms padrão do navegador
+- **4 tipos de notificações**: 
+  - ✅ **Sucesso** (success): Confirmações de ações bem-sucedidas
+  - ❌ **Erro** (error): Alertas de falhas ou problemas
+  - ⚠️ **Aviso** (warning): Avisos importantes e confirmações
+  - ℹ️ **Informação** (info): Mensagens informativas gerais
+- **Recursos avançados**:
+  - Animações suaves de entrada/saída
+  - Auto-fechamento após 5 segundos (configurável)
+  - Barra de progresso visual
+  - Botão de fechar manual
+  - Notificações de confirmação com botões de ação
+  - Empilhamento de múltiplas notificações
+  - Design responsivo para mobile
+  - Integração automática com mensagens Django
+
+**Como usar no código JavaScript:**
+```javascript
+// Notificações simples
+showSuccessNotification('Operação realizada com sucesso!');
+showErrorNotification('Ocorreu um erro ao processar.');
+showWarningNotification('Atenção: Verifique os dados.');
+showInfoNotification('Processando sua solicitação...');
+
+// Notificação de confirmação com ações
+showConfirmNotification(
+    'Deseja realmente excluir este item?',
+    function() { /* ação ao confirmar */ },
+    function() { /* ação ao cancelar (opcional) */ }
+);
+```
+
 ### Autenticação e Usuários
 - Modelo customizado de usuário (`Usuario`) baseado em `AbstractUser`.
 - Dois tipos de usuário: Cliente e Gerente.

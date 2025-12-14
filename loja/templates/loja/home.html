@@ -142,15 +142,15 @@ function adicionarCarrinho(produtoId) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            alert('Produto adicionado ao carrinho!');
+            showSuccessNotification('Produto adicionado ao carrinho!');
             // Atualizar contador do carrinho
-            location.reload();
+            setTimeout(() => location.reload(), 1000);
         } else {
-            alert('Erro: ' + data.message);
+            showErrorNotification('Erro: ' + data.message);
         }
     })
     .catch(error => {
-        alert('Erro ao adicionar produto');
+        showErrorNotification('Erro ao adicionar produto');
     });
 }
 </script>

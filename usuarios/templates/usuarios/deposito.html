@@ -155,7 +155,7 @@ document.getElementById('valor').addEventListener('input', function(e) {
     
     // Atualizar simulação
     const valorFloat = parseFloat(value.replace(',', '.')) || 0;
-    const saldoAtual = {{ cliente.saldo }};
+    const saldoAtual = parseFloat('{{ cliente.saldo }}'.replace(',', '.'));
     
     document.getElementById('valor-deposito').textContent = 'R$ ' + valorFloat.toFixed(2).replace('.', ',');
     document.getElementById('novo-saldo').textContent = 'R$ ' + (saldoAtual + valorFloat).toFixed(2).replace('.', ',');
@@ -167,7 +167,7 @@ document.querySelector('form').addEventListener('submit', function(e) {
     
     if (!valor || valor === '0' || valor === '0,00') {
         e.preventDefault();
-        alert('Informe um valor válido para o depósito');
+        showErrorNotification('Informe um valor válido para o depósito');
         return;
     }
     
@@ -175,15 +175,22 @@ document.querySelector('form').addEventListener('submit', function(e) {
     
     if (valorFloat > 10000) {
         e.preventDefault();
-        alert('Valor máximo por transação é R$ 10.000,00');
+        showWarningNotification('Valor máximo por transação é R$ 10.000,00');
         return;
     }
     
     if (valorFloat < 0.01) {
         e.preventDefault();
-        alert('Valor mínimo para depósito é R$ 0,01');
+        showErrorNotification('Valor mínimo para depósito é R$ 0,01');
         return;
     }
+    
+    // Mostrar loading
+    const submitBtn = this.querySelector('button[type="submit"]');
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processando...';
+    
+    showInfoNotification('Processando depósito...', 2000);
 });
 </script>
 {% endblock %}

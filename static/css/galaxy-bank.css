@@ -290,3 +290,507 @@
 ::-webkit-scrollbar-thumb:hover {
     background: var(--galaxy-primary);
 }
+
+/* ===== SISTEMA DE NOTIFICAÇÕES PERSONALIZADAS ===== */
+
+/* Container de notificações */
+.galaxy-notifications-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    max-width: 420px;
+    pointer-events: none;
+}
+
+/* Notificação individual */
+.galaxy-notification {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f9fa 100%);
+    border-radius: 16px;
+    box-shadow: 
+        0 20px 60px rgba(0, 0, 0, 0.2),
+        0 8px 20px rgba(0, 0, 0, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    margin-bottom: 16px;
+    padding: 20px 24px;
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+    pointer-events: all;
+    transform: translateX(500px) scale(0.9);
+    opacity: 0;
+    transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(10px);
+}
+
+/* Gradiente de fundo animado */
+.galaxy-notification::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+        135deg,
+        rgba(111, 66, 193, 0.05) 0%,
+        rgba(13, 110, 253, 0.05) 100%
+    );
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+}
+
+.galaxy-notification:hover::after {
+    opacity: 1;
+}
+
+.galaxy-notification.show {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+}
+
+.galaxy-notification.hide {
+    transform: translateX(500px) scale(0.9);
+    opacity: 0;
+}
+
+/* Barra lateral colorida animada */
+.galaxy-notification::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 5px;
+    height: 100%;
+    background: currentColor;
+    animation: notificationBarPulse 2s ease-in-out infinite;
+}
+
+@keyframes notificationBarPulse {
+    0%, 100% { opacity: 1; transform: scaleY(1); }
+    50% { opacity: 0.7; transform: scaleY(0.95); }
+}
+
+/* Barra de progresso inferior */
+.galaxy-notification-progress {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 4px;
+    width: 100%;
+    background: linear-gradient(90deg, currentColor 0%, currentColor 100%);
+    opacity: 0.25;
+    transform-origin: left;
+    animation: notificationProgress 5s linear;
+    border-radius: 0 0 16px 16px;
+}
+
+@keyframes notificationProgress {
+    from { transform: scaleX(1); }
+    to { transform: scaleX(0); }
+}
+
+/* Container do ícone */
+.galaxy-notification-icon {
+    flex-shrink: 0;
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    font-size: 22px;
+    position: relative;
+    animation: notificationIconEntrance 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Efeito de pulso no ícone */
+.galaxy-notification-icon::before {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border-radius: 14px;
+    background: currentColor;
+    opacity: 0.2;
+    animation: iconPulse 2s ease-in-out infinite;
+}
+
+@keyframes iconPulse {
+    0%, 100% { transform: scale(1); opacity: 0.2; }
+    50% { transform: scale(1.1); opacity: 0; }
+}
+
+@keyframes notificationIconEntrance {
+    0% { 
+        transform: scale(0) rotate(-180deg);
+        opacity: 0;
+    }
+    60% { 
+        transform: scale(1.15) rotate(10deg);
+    }
+    100% { 
+        transform: scale(1) rotate(0deg);
+        opacity: 1;
+    }
+}
+
+/* Conteúdo da notificação */
+.galaxy-notification-content {
+    flex: 1;
+    min-width: 0;
+    padding-top: 2px;
+}
+
+.galaxy-notification-title {
+    font-weight: 700;
+    font-size: 16px;
+    margin: 0 0 6px 0;
+    color: #1a1a1a;
+    letter-spacing: -0.02em;
+    text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
+}
+
+.galaxy-notification-message {
+    font-size: 14px;
+    margin: 0;
+    color: #495057;
+    line-height: 1.5;
+    font-weight: 400;
+}
+
+/* Botão de fechar */
+.galaxy-notification-close {
+    flex-shrink: 0;
+    background: rgba(0, 0, 0, 0.05);
+    border: none;
+    font-size: 18px;
+    color: #6c757d;
+    cursor: pointer;
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    opacity: 0.6;
+}
+
+.galaxy-notification-close:hover {
+    background: rgba(220, 53, 69, 0.1);
+    color: #dc3545;
+    opacity: 1;
+    transform: rotate(90deg) scale(1.1);
+}
+
+.galaxy-notification-close:active {
+    transform: rotate(90deg) scale(0.95);
+}
+
+/* Tipos de notificação - Success */
+.galaxy-notification.success {
+    color: #198754;
+}
+
+.galaxy-notification.success .galaxy-notification-icon {
+    background: linear-gradient(135deg, #198754 0%, #20c997 100%);
+    color: white;
+}
+
+.galaxy-notification.success .galaxy-notification-title {
+    color: #198754;
+}
+
+/* Tipos de notificação - Error */
+.galaxy-notification.error {
+    color: #dc3545;
+}
+
+.galaxy-notification.error .galaxy-notification-icon {
+    background: linear-gradient(135deg, #dc3545 0%, #e35d6a 100%);
+    color: white;
+}
+
+.galaxy-notification.error .galaxy-notification-title {
+    color: #dc3545;
+}
+
+/* Tipos de notificação - Warning */
+.galaxy-notification.warning {
+    color: #fd7e14;
+}
+
+.galaxy-notification.warning .galaxy-notification-icon {
+    background: linear-gradient(135deg, #ffc107 0%, #fd7e14 100%);
+    color: white;
+}
+
+.galaxy-notification.warning .galaxy-notification-title {
+    color: #fd7e14;
+}
+
+/* Tipos de notificação - Info */
+.galaxy-notification.info {
+    color: #0dcaf0;
+}
+
+.galaxy-notification.info .galaxy-notification-icon {
+    background: linear-gradient(135deg, #0dcaf0 0%, #0d6efd 100%);
+    color: white;
+}
+
+.galaxy-notification.info .galaxy-notification-title {
+    color: #0d6efd;
+}
+
+/* Botões de ação em notificações de confirmação */
+.galaxy-notification-actions {
+    margin-top: 12px;
+    display: flex;
+    gap: 8px;
+}
+
+.galaxy-notification-actions .btn {
+    font-size: 13px;
+    padding: 6px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.3s;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.galaxy-notification-actions .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.galaxy-notification-actions .btn:active {
+    transform: translateY(0);
+}
+
+/* Efeitos de hover na notificação */
+.galaxy-notification:hover {
+    transform: translateX(-4px) scale(1.02);
+    box-shadow: 
+        0 24px 70px rgba(0, 0, 0, 0.25),
+        0 10px 25px rgba(0, 0, 0, 0.18),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+/* Badge de contador (para múltiplas notificações do mesmo tipo) */
+.galaxy-notification-badge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: linear-gradient(135deg, #6f42c1, #0d6efd);
+    color: white;
+    border-radius: 12px;
+    padding: 4px 8px;
+    font-size: 11px;
+    font-weight: 700;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    animation: badgeBounce 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes badgeBounce {
+    0% { transform: scale(0); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+
+/* Responsividade para mobile */
+@media (max-width: 768px) {
+    .galaxy-notifications-container {
+        right: 12px;
+        left: 12px;
+        top: 12px;
+        max-width: none;
+    }
+    
+    .galaxy-notification {
+        padding: 16px 18px;
+        gap: 12px;
+    }
+    
+    .galaxy-notification-icon {
+        width: 44px;
+        height: 44px;
+        font-size: 20px;
+    }
+    
+    .galaxy-notification-title {
+        font-size: 15px;
+    }
+    
+    .galaxy-notification-message {
+        font-size: 13px;
+    }
+}
+
+/* Animação especial para notificações importantes */
+@keyframes importantShake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
+    20%, 40%, 60%, 80% { transform: translateX(4px); }
+}
+
+.galaxy-notification.important {
+    animation: importantShake 0.6s;
+}
+
+/* Loading spinner para notificações de processamento */
+.galaxy-notification-spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 3px solid rgba(0, 0, 0, 0.1);
+    border-top-color: currentColor;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Efeito glassmorphism para notificações */
+.galaxy-notification.glass {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Notificação com sombra colorida (glow effect) */
+.galaxy-notification.success.show {
+    box-shadow: 
+        0 20px 60px rgba(25, 135, 84, 0.25),
+        0 8px 20px rgba(0, 0, 0, 0.15),
+        0 0 40px rgba(25, 135, 84, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.galaxy-notification.error.show {
+    box-shadow: 
+        0 20px 60px rgba(220, 53, 69, 0.25),
+        0 8px 20px rgba(0, 0, 0, 0.15),
+        0 0 40px rgba(220, 53, 69, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.galaxy-notification.warning.show {
+    box-shadow: 
+        0 20px 60px rgba(255, 193, 7, 0.25),
+        0 8px 20px rgba(0, 0, 0, 0.15),
+        0 0 40px rgba(255, 193, 7, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.galaxy-notification.info.show {
+    box-shadow: 
+        0 20px 60px rgba(13, 202, 240, 0.25),
+        0 8px 20px rgba(0, 0, 0, 0.15),
+        0 0 40px rgba(13, 202, 240, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+/* Padrão de fundo sutil */
+.galaxy-notification::after {
+    background-image: 
+        repeating-linear-gradient(
+            45deg,
+            transparent,
+            transparent 10px,
+            rgba(255, 255, 255, 0.03) 10px,
+            rgba(255, 255, 255, 0.03) 20px
+        );
+}
+
+/* Efeito de brilho no ícone */
+.galaxy-notification-icon i {
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+/* Animação de entrada mais elaborada para notificações importantes */
+@keyframes importantEntrance {
+    0% {
+        transform: translateX(500px) scale(0.8) rotate(10deg);
+        opacity: 0;
+    }
+    60% {
+        transform: translateX(-20px) scale(1.05) rotate(-2deg);
+        opacity: 1;
+    }
+    80% {
+        transform: translateX(10px) scale(0.98) rotate(1deg);
+    }
+    100% {
+        transform: translateX(0) scale(1) rotate(0);
+        opacity: 1;
+    }
+}
+
+.galaxy-notification.important.show {
+    animation: importantEntrance 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Estilo para botões dentro das notificações */
+.galaxy-notification-actions .btn {
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.galaxy-notification-actions .btn-success {
+    background: linear-gradient(135deg, #198754 0%, #20c997 100%);
+    border: none;
+}
+
+.galaxy-notification-actions .btn-secondary {
+    background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+    border: none;
+}
+
+/* Progress bar estilizada */
+.galaxy-notification .progress {
+    background: rgba(0, 0, 0, 0.08);
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.galaxy-notification .progress-bar {
+    transition: width 0.3s ease;
+}
+
+/* Dark mode support (opcional) */
+@media (prefers-color-scheme: dark) {
+    .galaxy-notification {
+        background: linear-gradient(135deg, #2d3436 0%, #1e272e 100%);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 
+            0 20px 60px rgba(0, 0, 0, 0.5),
+            0 8px 20px rgba(0, 0, 0, 0.3),
+            inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    }
+    
+    .galaxy-notification-title {
+        color: #ffffff;
+    }
+    
+    .galaxy-notification-message {
+        color: #dfe6e9;
+    }
+    
+    .galaxy-notification-close {
+        background: rgba(255, 255, 255, 0.1);
+        color: #dfe6e9;
+    }
+}
