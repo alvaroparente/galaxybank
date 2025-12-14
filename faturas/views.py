@@ -307,8 +307,10 @@ def fechar_fatura(request, fatura_id):
             from datetime import datetime
             data_vencimento = datetime.strptime(data_vencimento_str, '%Y-%m-%d').date()
             
-            if data_vencimento <= fatura.data_emissao:
-                messages.error(request, 'Data de vencimento deve ser posterior à data de emissão.')
+            # Data de vencimento deve ser no mínimo no dia seguinte
+            from datetime import date
+            if data_vencimento < date.today():
+                messages.error(request, 'Data de vencimento não pode ser anterior a hoje.')
                 return redirect('faturas:fatura_atual')
             
             with transaction.atomic():
@@ -349,32 +351,40 @@ def pagar_fatura_completa(request, fatura_id):
         if fatura.status == 'paga':
             return JsonResponse({'success': False, 'message': 'Fatura já está paga'})
         
-        if cliente.saldo < fatura.saldo_devedor:
-            return JsonResponse({'success': False, 'message': 'Saldo insuficiente'})
+        # Calcular valor pendente
+        valor_pendente = fatura.valor_total - fatura.valor_pago
+        
+        if valor_pendente <= 0:
+            return JsonResponse({'success': False, 'message': 'Fatura já está quitada'})
+        
+        if cliente.saldo < valor_pendente:
+            return JsonResponse({
+                'success': False, 
+                'message': f'Saldo insuficiente. Necessário: R$ {valor_pendente:.2f}'
+            })
         
         with transaction.atomic():
-            valor_pagamento = fatura.saldo_devedor
-            
             # Debitar do saldo do cliente
-            cliente.saldo -= valor_pagamento
+            cliente.saldo -= valor_pendente
             cliente.save()
             
             # Atualizar fatura
-            fatura.valor_pago += valor_pagamento
-            if fatura.saldo_devedor <= Decimal('0'):
-                fatura.status = 'paga'
+            fatura.valor_pago = fatura.valor_total
+            fatura.status = 'paga'
+            fatura.data_pagamento = timezone.now()
             fatura.save()
             
-            # Marcar parcelas como pagas
-            parcelas_pendentes = fatura.pagamentos.filter(pago=False)
-            for parcela in parcelas_pendentes:
-                parcela.pago = True
-                parcela.data_pagamento = timezone.now()
-                parcela.save()
+            # Registrar pagamento
+            PagamentoFatura.objects.create(
+                fatura=fatura,
+                valor_pago=valor_pendente,
+                forma_pagamento='saldo',
+                observacoes='Pagamento completo via saldo'
+            )
         
         return JsonResponse({
             'success': True, 
-            'message': f'Fatura paga com sucesso! Valor: R$ {valor_pagamento}'
+            'message': f'Fatura paga com sucesso! Valor: R$ {valor_pendente:.2f}'
         })
         
     except Cliente.DoesNotExist:

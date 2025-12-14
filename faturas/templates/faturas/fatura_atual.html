@@ -3,6 +3,7 @@
 {% block title %}Fatura Atual - Galaxy Bank{% endblock %}
 
 {% block content %}
+{% csrf_token %}
 <div class="container-fluid h-100">
     <div class="row h-100">
         <!-- Sidebar -->
@@ -273,17 +274,22 @@
                             </div>
                             {% endif %}
                             
-                            {% if fatura.status == 'fechada' and fatura.saldo_devedor > 0 %}
+                            {% if fatura.status != 'paga' and fatura.valor_total > 0 %}
                             <hr>
                             <div class="d-grid gap-2 mt-3">
-                                {% if cliente.saldo >= fatura.saldo_devedor %}
-                                <button class="btn btn-success" onclick="pagarFaturaCompleta()">
+                                {% if cliente.saldo >= fatura.valor_total %}
+                                <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#pagarFaturaModal">
                                     <i class="bi bi-credit-card"></i> Pagar Fatura
                                 </button>
+                                <small class="text-muted text-center d-block mt-2">
+                                    Seu saldo: R$ {{ cliente.saldo|floatformat:2 }}
+                                </small>
                                 {% else %}
-                                <div class="alert alert-warning">
+                                <div class="alert alert-warning mb-0">
                                     <i class="bi bi-exclamation-triangle"></i>
                                     Saldo insuficiente para quitar a fatura.
+                                    <br>
+                                    <small>Seu saldo: R$ {{ cliente.saldo|floatformat:2 }} | Necessário: R$ {{ fatura.valor_total|floatformat:2 }}</small>
                                 </div>
                                 {% endif %}
                                 
@@ -319,6 +325,54 @@
     </div>
 </div>
 
+<!-- Modal Pagar Fatura -->
+{% if fatura.status != 'paga' and fatura.valor_total > 0 %}
+<div class="modal fade" id="pagarFaturaModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header" style="background: var(--gradient-success);">
+                <h5 class="modal-title text-white">
+                    <i class="bi bi-credit-card"></i> Pagar Fatura
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center mb-4">
+                    <h3 class="text-success">R$ {{ fatura.valor_total|floatformat:2 }}</h3>
+                    <p class="text-muted">Valor total da fatura</p>
+                </div>
+                
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between mb-2">
+                            <span>Seu saldo disponível:</span>
+                            <strong class="text-primary">R$ {{ cliente.saldo|floatformat:2 }}</strong>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span>Saldo após pagamento:</span>
+                            <strong class="text-success" id="saldoFinal"></strong>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="alert alert-info">
+                    <i class="bi bi-info-circle"></i>
+                    O valor será debitado do seu saldo e a fatura será marcada como paga.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle"></i> Cancelar
+                </button>
+                <button type="button" class="btn btn-success" onclick="confirmarPagamento()">
+                    <i class="bi bi-check-circle"></i> Confirmar Pagamento
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
 <!-- Modal Fechar Fatura -->
 {% if fatura.status == 'aberta' %}
 <div class="modal fade" id="fecharFaturaModal" tabindex="-1">
@@ -337,7 +391,7 @@
                     Após fechar a fatura, novas compras serão incluídas na próxima fatura do mês seguinte.
                 </div>
                 
-                <form method="post" action="{% url 'faturas:fechar_fatura' fatura.id %}">
+                <form method="post" action="{% url 'faturas:fechar_fatura' fatura.id %}" id="formFecharFatura">
                     {% csrf_token %}
                     <div class="mb-3">
                         <label for="data_vencimento" class="form-label">Data de vencimento:</label>
@@ -348,7 +402,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="submit" form="fecharFaturaModal" class="btn btn-warning">
+                <button type="submit" form="formFecharFatura" class="btn btn-warning">
                     <i class="bi bi-lock"></i> Fechar Fatura
                 </button>
             </div>
@@ -358,45 +412,75 @@
 {% endif %}
 
 <script>
-function pagarFaturaCompleta() {
-    const saldoDevedor = parseFloat('{{ fatura.saldo_devedor }}'.replace(',', '.'));
-    showConfirmNotification(
-        `Deseja pagar a fatura completa (R$ ${saldoDevedor.toFixed(2)}) usando seu saldo?`,
-        function() {
-            showInfoNotification('Processando pagamento...', 2000);
-            fetch(`/faturas/pagar-fatura-completa/{{ fatura.id }}/`, {
-                method: 'POST',
-                headers: {
-                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
-                    'Content-Type': 'application/json',
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    showSuccessNotification('Fatura paga com sucesso!');
-                    setTimeout(() => location.reload(), 1500);
-                } else {
-                    showErrorNotification('Erro ao processar pagamento: ' + data.message);
-                }
-            })
-            .catch(error => {
-                console.error('Erro:', error);
-                showErrorNotification('Erro ao processar pagamento.');
-            });
+function confirmarPagamento() {
+    const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    
+    // Fechar o modal
+    const modal = bootstrap.Modal.getInstance(document.getElementById('pagarFaturaModal'));
+    if (modal) modal.hide();
+    
+    showInfoNotification('Processando pagamento...', 2000);
+    
+    fetch(`/faturas/pagar-fatura-completa/{{ fatura.id }}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': csrfToken,
+            'Content-Type': 'application/json',
         }
-    );
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showSuccessNotification('Fatura paga com sucesso!');
+            setTimeout(() => location.reload(), 1500);
+        } else {
+            showErrorNotification('Erro: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Erro:', error);
+        showErrorNotification('Erro ao processar pagamento.');
+    });
 }
 
 // Configurar data mínima para vencimento (hoje + 1 dia)
 document.addEventListener('DOMContentLoaded', function() {
+    // Calcular saldo final no modal de pagamento
+    const saldoFinalEl = document.getElementById('saldoFinal');
+    if (saldoFinalEl) {
+        const saldoAtual = parseFloat('{{ cliente.saldo }}'.replace(',', '.'));
+        const valorFatura = parseFloat('{{ fatura.valor_total }}'.replace(',', '.'));
+        const saldoFinal = saldoAtual - valorFatura;
+        saldoFinalEl.textContent = 'R$ ' + saldoFinal.toFixed(2).replace('.', ',');
+    }
+    
     const dataVencimento = document.getElementById('data_vencimento');
     if (dataVencimento) {
-        const amanha = new Date();
-        amanha.setDate(amanha.getDate() + 1);
+        const hoje = new Date();
+        const amanha = new Date(hoje);
+        amanha.setDate(hoje.getDate() + 1);
         const dataMinima = amanha.toISOString().split('T')[0];
+        
+        // Data padrão: 7 dias a partir de hoje
+        const seteDias = new Date(hoje);
+        seteDias.setDate(hoje.getDate() + 7);
+        const dataPadrao = seteDias.toISOString().split('T')[0];
+        
         dataVencimento.min = dataMinima;
-        dataVencimento.value = dataMinima;
+        dataVencimento.value = dataPadrao;
+    }
+    
+    // Validar formulário antes de enviar
+    const form = document.getElementById('formFecharFatura');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            const dataInput = document.getElementById('data_vencimento');
+            if (!dataInput.value) {
+                e.preventDefault();
+                showErrorNotification('Por favor, selecione uma data de vencimento.');
+                return false;
+            }
+        });
     }
 });
 </script>

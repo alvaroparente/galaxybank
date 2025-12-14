@@ -1,304 +1,453 @@
-{% extends "usuarios/base.html" %}
+{% extends 'usuarios/base.html' %}
+{% load static %}
 
 {% block title %}Minhas Compras - Galaxy Bank{% endblock %}
 
-{% block content %}
-<div class="container-fluid h-100">
-    <div class="row h-100">
-        <!-- Sidebar -->
-        <div class="col-md-3 col-lg-2 sidebar bg-dark">
-            <div class="position-sticky pt-3">
-                <ul class="nav flex-column">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'usuarios:dashboard_cliente' %}">
-                            <i class="bi bi-speedometer2"></i> Dashboard
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'loja:home' %}">
-                            <i class="bi bi-shop"></i> Loja
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link active" href="{% url 'loja:compras' %}">
-                            <i class="bi bi-bag-check"></i> Minhas Compras
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </div>
+{% block extra_css %}
+<style>
+    .galaxy-sidebar {
+        background: var(--gradient-primary);
+        min-height: calc(100vh - 56px);
+        padding: 2rem 0;
+        box-shadow: var(--shadow-lg);
+    }
+    
+    .sidebar-item {
+        padding: 1rem 1.5rem;
+        margin: 0.5rem 0;
+        color: white;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        transition: all 0.3s ease;
+        border-left: 4px solid transparent;
+    }
+    
+    .sidebar-item:hover {
+        background: rgba(255, 255, 255, 0.1);
+        border-left-color: white;
+        color: white;
+    }
+    
+    .sidebar-item.active {
+        background: rgba(255, 255, 255, 0.2);
+        border-left-color: white;
+    }
+    
+    .sidebar-item i {
+        font-size: 1.25rem;
+    }
+    
+    .galaxy-header {
+        background: white;
+        border-radius: 1rem;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: var(--shadow-sm);
+    }
+    
+    .filter-pills {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+        margin-top: 1.5rem;
+    }
+    
+    .filter-pill {
+        padding: 0.5rem 1.5rem;
+        border-radius: 2rem;
+        border: 2px solid #e0e0e0;
+        background: white;
+        color: #666;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        font-weight: 500;
+    }
+    
+    .filter-pill:hover {
+        border-color: var(--galaxy-primary);
+        color: var(--galaxy-primary);
+        transform: translateY(-2px);
+    }
+    
+    .filter-pill.active {
+        background: var(--gradient-primary);
+        border-color: transparent;
+        color: white;
+    }
+    
+    .compra-card {
+        background: white;
+        border-radius: 1rem;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: var(--shadow-sm);
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+    }
+    
+    .compra-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--shadow-lg);
+        border-color: var(--galaxy-primary);
+    }
+    
+    .status-badge {
+        padding: 0.5rem 1rem;
+        border-radius: 2rem;
+        font-size: 0.875rem;
+        font-weight: 600;
+    }
+    
+    .status-pendente {
+        background: linear-gradient(135deg, #FFA726 0%, #FF9800 100%);
+        color: white;
+    }
+    
+    .status-aprovada {
+        background: linear-gradient(135deg, #29B6F6 0%, #0288D1 100%);
+        color: white;
+    }
+    
+    .status-entregue {
+        background: linear-gradient(135deg, #66BB6A 0%, #43A047 100%);
+        color: white;
+    }
+    
+    .status-cancelada {
+        background: linear-gradient(135deg, #EF5350 0%, #E53935 100%);
+        color: white;
+    }
+    
+    .item-thumb {
+        width: 120px;
+        height: 120px;
+        object-fit: cover;
+        border-radius: 0.75rem;
+        box-shadow: var(--shadow-sm);
+    }
+    
+    .item-thumb {
+        width: 80px;
+        height: 80px;
+        object-fit: cover;
+        border-radius: 0.5rem;
+        box-shadow: var(--shadow-sm);
+    }
+    
+    .item-compra {
+        padding: 1rem;
+        background: white;
+        border-radius: 0.5rem;
+        border: 1px solid var(--galaxy-border);
+        transition: all 0.3s ease;
+    }
+    
+    .item-compra:hover {
+        border-color: var(--galaxy-primary);
+        box-shadow: var(--shadow-sm);
+    }
+    
+    .compra-details {
+        padding: 1.5rem;
+        background: var(--galaxy-light);
+        border-radius: 0.75rem;
+    }
+    
+    .compra-details h6 {
+        font-weight: 700;
+        color: var(--galaxy-text);
+        margin-bottom: 1rem;
+    }
+    
+    .detail-item {
+        display: flex;
+        align-items: start;
+        gap: 0.75rem;
+    }
+    
+    .detail-item i {
+        font-size: 1.5rem;
+        margin-top: 0.25rem;
+    }
+    
+    .detail-item small {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .detail-item strong {
+        font-size: 0.9rem;
+        color: var(--galaxy-text);
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        background: white;
+        border-radius: 1rem;
+        box-shadow: var(--shadow-sm);
+    }
+    
+    .empty-state i {
+        font-size: 5rem;
+        color: #e0e0e0;
+        margin-bottom: 1.5rem;
+    }
+    
+    .pagination .page-link {
+        border-radius: 0.5rem;
+        margin: 0 0.25rem;
+        border: 2px solid #e0e0e0;
+        color: var(--galaxy-primary);
+    }
+    
+    .pagination .page-item.active .page-link {
+        background: var(--gradient-primary);
+        border-color: transparent;
+    }
+</style>
+{% endblock %}
 
-        <!-- Main content -->
-        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
-            <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom">
-                <h1 class="h2">
-                    <i class="bi bi-bag-check"></i> Minhas Compras
-                </h1>
-                <div class="btn-toolbar mb-2 mb-md-0">
-                    <div class="btn-group me-2">
-                        <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
-                            Filtrar por Status
-                        </button>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="?status=">Todos</a></li>
-                            <li><a class="dropdown-item" href="?status=processando">Processando</a></li>
-                            <li><a class="dropdown-item" href="?status=enviado">Enviado</a></li>
-                            <li><a class="dropdown-item" href="?status=entregue">Entregue</a></li>
-                            <li><a class="dropdown-item" href="?status=cancelado">Cancelado</a></li>
-                        </ul>
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <nav class="col-md-3 col-lg-2 d-md-block galaxy-sidebar p-0">
+            <div class="position-sticky">
+                <a href="{% url 'loja:home' %}" class="sidebar-item">
+                    <i class="bi bi-house-door"></i>
+                    <span>Início</span>
+                </a>
+                <a href="{% url 'loja:produtos' %}" class="sidebar-item">
+                    <i class="bi bi-grid"></i>
+                    <span>Produtos</span>
+                </a>
+                <a href="{% url 'loja:carrinho' %}" class="sidebar-item">
+                    <i class="bi bi-cart"></i>
+                    <span>Carrinho</span>
+                </a>
+                <a href="{% url 'loja:compras' %}" class="sidebar-item active">
+                    <i class="bi bi-bag-check"></i>
+                    <span>Minhas Compras</span>
+                </a>
+                <a href="{% url 'usuarios:dashboard_cliente' %}" class="sidebar-item">
+                    <i class="bi bi-speedometer2"></i>
+                    <span>Dashboard</span>
+                </a>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4 py-4">
+            <!-- Header -->
+            <div class="galaxy-header">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h2 class="mb-2">
+                            <i class="bi bi-bag-check"></i> Minhas Compras
+                        </h2>
+                        <p class="text-muted mb-0">Acompanhe seus pedidos e histórico de compras</p>
                     </div>
+                </div>
+                
+                <!-- Filtros -->
+                <div class="filter-pills">
+                    <a href="{% url 'loja:compras' %}" class="filter-pill {% if not status_filtro %}active{% endif %}">
+                        <i class="bi bi-list"></i> Todas
+                    </a>
+                    <a href="?status=pendente" class="filter-pill {% if status_filtro == 'pendente' %}active{% endif %}">
+                        <i class="bi bi-clock"></i> Pendente
+                    </a>
+                    <a href="?status=aprovada" class="filter-pill {% if status_filtro == 'aprovada' %}active{% endif %}">
+                        <i class="bi bi-check-circle"></i> Aprovada
+                    </a>
+                    <a href="?status=entregue" class="filter-pill {% if status_filtro == 'entregue' %}active{% endif %}">
+                        <i class="bi bi-box-seam"></i> Entregue
+                    </a>
+                    <a href="?status=cancelada" class="filter-pill {% if status_filtro == 'cancelada' %}active{% endif %}">
+                        <i class="bi bi-x-circle"></i> Cancelada
+                    </a>
                 </div>
             </div>
 
-            {% if compras %}
             <!-- Lista de Compras -->
-            <div class="row">
-                {% for compra in compras %}
-                <div class="col-12 mb-4">
-                    <div class="card">
-                        <div class="card-header d-flex justify-content-between align-items-center">
-                            <div>
-                                <strong>Pedido #{{ compra.id }}</strong>
-                                <span class="text-muted ms-2">{{ compra.data_compra|date:"d/m/Y H:i" }}</span>
-                            </div>
-                            <div>
-                                {% if compra.status == 'processando' %}
-                                    <span class="badge bg-warning">Processando</span>
-                                {% elif compra.status == 'enviado' %}
-                                    <span class="badge bg-info">Enviado</span>
-                                {% elif compra.status == 'entregue' %}
-                                    <span class="badge bg-success">Entregue</span>
-                                {% elif compra.status == 'cancelado' %}
-                                    <span class="badge bg-danger">Cancelado</span>
-                                {% endif %}
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            <div class="row">
-                                <div class="col-md-8">
-                                    <h6>Itens Comprados:</h6>
-                                    {% for item in compra.itens.all %}
-                                    <div class="d-flex align-items-center mb-2">
-                                        <img src="{{ item.produto.imagem_url }}" class="rounded me-3" style="width: 50px; height: 50px; object-fit: cover;" alt="{{ item.produto.titulo }}">
-                                        <div class="flex-grow-1">
-                                            <div class="fw-bold">{{ item.produto.titulo }}</div>
-                                            <small class="text-muted">
-                                                Qtd: {{ item.quantidade }} × R$ {{ item.preco_unitario|floatformat:2 }}
-                                            </small>
-                                        </div>
-                                        <div class="text-end">
-                                            <strong>R$ {{ item.get_subtotal|floatformat:2 }}</strong>
-                                        </div>
-                                    </div>
-                                    {% if not forloop.last %}<hr class="my-2">{% endif %}
-                                    {% endfor %}
-                                </div>
-                                <div class="col-md-4">
-                                    <div class="card bg-light">
-                                        <div class="card-body">
-                                            <h6>Resumo do Pedido</h6>
-                                            <div class="d-flex justify-content-between">
-                                                <span>Total:</span>
-                                                <strong>R$ {{ compra.valor_total|floatformat:2 }}</strong>
-                                            </div>
-                                            <div class="d-flex justify-content-between">
-                                                <span>Forma de Pagamento:</span>
-                                                <span>
-                                                    {% if compra.forma_pagamento == 'saldo' %}
-                                                        <i class="bi bi-wallet2"></i> Saldo
-                                                    {% else %}
-                                                        <i class="bi bi-credit-card"></i> Crédito
-                                                    {% endif %}
-                                                </span>
-                                            </div>
-                                            {% if compra.forma_pagamento == 'credito' and compra.fatura %}
-                                            <div class="d-flex justify-content-between">
-                                                <span>Parcelas:</span>
-                                                <span>{{ compra.fatura.numero_parcelas }}x</span>
-                                            </div>
-                                            <div class="mt-2">
-                                                <a href="{% url 'faturas:detalhes_fatura' compra.fatura.id %}" class="btn btn-sm btn-outline-primary">
-                                                    <i class="bi bi-receipt"></i> Ver Fatura
-                                                </a>
-                                            </div>
-                                            {% endif %}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="card-footer bg-transparent">
+            {% if page_obj %}
+                {% for compra in page_obj %}
+                <div class="compra-card">
+                    <div class="row">
+                        <!-- Cabeçalho da Compra -->
+                        <div class="col-12 mb-3">
                             <div class="d-flex justify-content-between align-items-center">
                                 <div>
-                                    {% if compra.codigo_rastreamento %}
-                                    <small class="text-muted">
-                                        <i class="bi bi-truck"></i> Código de rastreamento: {{ compra.codigo_rastreamento }}
-                                    </small>
-                                    {% endif %}
+                                    <h5 class="mb-1">
+                                        <i class="bi bi-receipt"></i> Pedido #{{ compra.id }}
+                                    </h5>
+                                    <p class="text-muted mb-0 small">
+                                        <i class="bi bi-calendar-event"></i> {{ compra.data_compra|date:"d/m/Y H:i" }}
+                                    </p>
                                 </div>
-                                <div>
-                                    {% if compra.status == 'processando' %}
-                                    <button class="btn btn-sm btn-outline-danger" onclick="cancelarPedido({{ compra.id }})">
-                                        <i class="bi bi-x-circle"></i> Cancelar Pedido
-                                    </button>
+                                <span class="status-badge status-{{ compra.status }}">
+                                    {% if compra.status == 'pendente' %}
+                                        <i class="bi bi-clock"></i> Pendente
+                                    {% elif compra.status == 'aprovada' %}
+                                        <i class="bi bi-check-circle"></i> Aprovada
+                                    {% elif compra.status == 'entregue' %}
+                                        <i class="bi bi-box-seam"></i> Entregue
+                                    {% elif compra.status == 'cancelada' %}
+                                        <i class="bi bi-x-circle"></i> Cancelada
                                     {% endif %}
-                                    <button class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#detalhesModal{{ compra.id }}">
-                                        <i class="bi bi-eye"></i> Ver Detalhes
-                                    </button>
-                                </div>
+                                </span>
                             </div>
                         </div>
-                    </div>
-                </div>
-
-                <!-- Modal de Detalhes -->
-                <div class="modal fade" id="detalhesModal{{ compra.id }}" tabindex="-1">
-                    <div class="modal-dialog modal-lg">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title">Detalhes do Pedido #{{ compra.id }}</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                            </div>
-                            <div class="modal-body">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <h6>Informações do Pedido</h6>
-                                        <p><strong>Data:</strong> {{ compra.data_compra|date:"d/m/Y H:i:s" }}</p>
-                                        <p><strong>Status:</strong> 
-                                            {% if compra.status == 'processando' %}
-                                                <span class="badge bg-warning">Processando</span>
-                                            {% elif compra.status == 'enviado' %}
-                                                <span class="badge bg-info">Enviado</span>
-                                            {% elif compra.status == 'entregue' %}
-                                                <span class="badge bg-success">Entregue</span>
-                                            {% elif compra.status == 'cancelado' %}
-                                                <span class="badge bg-danger">Cancelado</span>
-                                            {% endif %}
-                                        </p>
-                                        <p><strong>Valor Total:</strong> R$ {{ compra.valor_total|floatformat:2 }}</p>
-                                        <p><strong>Forma de Pagamento:</strong> 
-                                            {% if compra.forma_pagamento == 'saldo' %}
-                                                Saldo (à vista)
+                        
+                        <!-- Itens da Compra -->
+                        <div class="col-12 mb-3">
+                            <div class="compra-details">
+                                <h6 class="mb-3"><i class="bi bi-bag"></i> Itens do Pedido</h6>
+                                {% for item in compra.itens.all %}
+                                <div class="item-compra mb-3">
+                                    <div class="row align-items-center">
+                                        <div class="col-auto">
+                                            {% if item.produto.imagem_url %}
+                                                <img src="{{ item.produto.imagem_url }}" alt="{{ item.produto.titulo }}" class="item-thumb">
                                             {% else %}
-                                                Crédito (parcelado)
+                                                <div class="item-thumb bg-light d-flex align-items-center justify-content-center">
+                                                    <i class="bi bi-image text-muted"></i>
+                                                </div>
                                             {% endif %}
-                                        </p>
+                                        </div>
+                                        <div class="col">
+                                            <h6 class="mb-1">{{ item.produto.titulo }}</h6>
+                                            <p class="text-muted mb-1 small">{{ item.produto.descricao|truncatewords:20 }}</p>
+                                            <div class="d-flex gap-3 align-items-center">
+                                                <span class="badge bg-secondary">
+                                                    <i class="bi bi-box"></i> Qtd: {{ item.quantidade }}
+                                                </span>
+                                                <span class="text-muted small">
+                                                    R$ {{ item.preco_unitario|floatformat:2 }} un.
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="col-auto">
+                                            <h5 class="mb-0 text-primary">
+                                                R$ {{ item.valor_total|floatformat:2 }}
+                                            </h5>
+                                        </div>
                                     </div>
-                                    <div class="col-md-6">
-                                        <h6>Histórico de Status</h6>
-                                        <div class="timeline">
-                                            <div class="timeline-item">
-                                                <i class="bi bi-check-circle-fill text-success"></i>
-                                                <span>Pedido realizado - {{ compra.data_compra|date:"d/m H:i" }}</span>
+                                </div>
+                                {% empty %}
+                                <p class="text-muted mb-0">Nenhum item encontrado</p>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <!-- Resumo e Ações -->
+                        <div class="col-12">
+                            <div class="row">
+                                <div class="col-md-8">
+                                    <div class="row g-3">
+                                        <div class="col-sm-6">
+                                            <div class="detail-item">
+                                                <i class="bi bi-credit-card text-success"></i>
+                                                <div>
+                                                    <small class="text-muted d-block">Pagamento</small>
+                                                    <strong>
+                                                        {% if compra.forma_pagamento == 'saldo' %}
+                                                            À vista (Saldo)
+                                                        {% else %}
+                                                            Crédito em {{ compra.parcelas }}x
+                                                        {% endif %}
+                                                    </strong>
+                                                </div>
                                             </div>
-                                            {% if compra.status != 'cancelado' %}
-                                            <div class="timeline-item">
-                                                <i class="bi bi-clock text-warning"></i>
-                                                <span>Em processamento</span>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <div class="detail-item">
+                                                <i class="bi bi-box-seam text-info"></i>
+                                                <div>
+                                                    <small class="text-muted d-block">Total de Itens</small>
+                                                    <strong>{{ compra.itens.count }} item{{ compra.itens.count|pluralize }}</strong>
+                                                </div>
                                             </div>
-                                            {% endif %}
-                                            {% if compra.status == 'enviado' or compra.status == 'entregue' %}
-                                            <div class="timeline-item">
-                                                <i class="bi bi-truck text-info"></i>
-                                                <span>Produto enviado</span>
-                                            </div>
-                                            {% endif %}
-                                            {% if compra.status == 'entregue' %}
-                                            <div class="timeline-item">
-                                                <i class="bi bi-check-circle-fill text-success"></i>
-                                                <span>Produto entregue</span>
-                                            </div>
-                                            {% endif %}
-                                            {% if compra.status == 'cancelado' %}
-                                            <div class="timeline-item">
-                                                <i class="bi bi-x-circle-fill text-danger"></i>
-                                                <span>Pedido cancelado</span>
-                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-4">
+                                    <div class="text-end">
+                                        <small class="text-muted d-block mb-1">Valor Total</small>
+                                        <h3 class="mb-3" style="background: var(--gradient-primary); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 800;">
+                                            R$ {{ compra.valor_total|floatformat:2 }}
+                                        </h3>
+                                        
+                                        <div class="d-flex flex-column gap-2">
+                                            {% if compra.status == 'pendente' %}
+                                            <button class="btn btn-outline-danger btn-sm" onclick="cancelarPedido({{ compra.id }})">
+                                                <i class="bi bi-x-circle"></i> Cancelar Pedido
+                                            </button>
                                             {% endif %}
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
                             </div>
                         </div>
                     </div>
                 </div>
                 {% endfor %}
-            </div>
 
-            <!-- Paginação -->
-            {% if is_paginated %}
-            <nav aria-label="Paginação">
-                <ul class="pagination justify-content-center">
-                    {% if page_obj.has_previous %}
-                    <li class="page-item">
-                        <a class="page-link" href="?page=1{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}">Primeira</a>
-                    </li>
-                    <li class="page-item">
-                        <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}">Anterior</a>
-                    </li>
-                    {% endif %}
-                    
-                    <li class="page-item active">
-                        <span class="page-link">{{ page_obj.number }} de {{ page_obj.paginator.num_pages }}</span>
-                    </li>
-                    
-                    {% if page_obj.has_next %}
-                    <li class="page-item">
-                        <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}">Próxima</a>
-                    </li>
-                    <li class="page-item">
-                        <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}">Última</a>
-                    </li>
-                    {% endif %}
-                </ul>
-            </nav>
-            {% endif %}
-            
+                <!-- Paginação -->
+                {% if is_paginated %}
+                <nav aria-label="Paginação" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page=1{% if status_filtro %}&status={{ status_filtro }}{% endif %}">
+                                <i class="bi bi-chevron-double-left"></i>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if status_filtro %}&status={{ status_filtro }}{% endif %}">
+                                <i class="bi bi-chevron-left"></i>
+                            </a>
+                        </li>
+                        {% endif %}
+                        
+                        <li class="page-item active">
+                            <span class="page-link">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+                        </li>
+                        
+                        {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if status_filtro %}&status={{ status_filtro }}{% endif %}">
+                                <i class="bi bi-chevron-right"></i>
+                            </a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if status_filtro %}&status={{ status_filtro }}{% endif %}">
+                                <i class="bi bi-chevron-double-right"></i>
+                            </a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+                {% endif %}
             {% else %}
-            <!-- Nenhuma Compra -->
-            <div class="text-center py-5">
-                <i class="bi bi-bag-x" style="font-size: 4rem; color: #ccc;"></i>
-                <h3 class="mt-3">Você ainda não fez nenhuma compra</h3>
-                <p class="text-muted">Explore nossa loja e encontre produtos incríveis!</p>
-                <a href="{% url 'loja:produtos' %}" class="btn btn-primary btn-lg">
-                    <i class="bi bi-shop"></i> Ir às Compras
-                </a>
-            </div>
+                <!-- Estado Vazio -->
+                <div class="empty-state">
+                    <i class="bi bi-bag-x"></i>
+                    <h3>Nenhuma compra encontrada</h3>
+                    <p class="text-muted mb-4">Explore nossa loja e encontre produtos incríveis!</p>
+                    <a href="{% url 'loja:produtos' %}" class="btn btn-lg" style="background: var(--gradient-primary); color: white;">
+                        <i class="bi bi-shop"></i> Ir às Compras
+                    </a>
+                </div>
             {% endif %}
         </main>
     </div>
 </div>
-
-<style>
-.timeline {
-    position: relative;
-    padding-left: 30px;
-}
-
-.timeline-item {
-    position: relative;
-    margin-bottom: 10px;
-}
-
-.timeline-item i {
-    position: absolute;
-    left: -25px;
-    top: 2px;
-}
-
-.timeline::before {
-    content: '';
-    position: absolute;
-    left: -17px;
-    top: 0;
-    bottom: 0;
-    width: 2px;
-    background: #dee2e6;
-}
-</style>
 
 <script>
 function cancelarPedido(pedidoId) {
@@ -306,6 +455,7 @@ function cancelarPedido(pedidoId) {
         'Tem certeza que deseja cancelar este pedido?',
         function() {
             showInfoNotification('Processando cancelamento...', 2000);
+            
             fetch(`/loja/cancelar-pedido/${pedidoId}/`, {
                 method: 'POST',
                 headers: {
@@ -319,12 +469,12 @@ function cancelarPedido(pedidoId) {
                     showSuccessNotification('Pedido cancelado com sucesso!');
                     setTimeout(() => location.reload(), 1500);
                 } else {
-                    showErrorNotification('Erro ao cancelar o pedido: ' + data.message);
+                    showErrorNotification('Erro ao cancelar: ' + data.message);
                 }
             })
             .catch(error => {
                 console.error('Erro:', error);
-                showErrorNotification('Erro ao cancelar o pedido.');
+                showErrorNotification('Erro ao processar cancelamento.');
             });
         }
     );

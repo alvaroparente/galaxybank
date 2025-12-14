@@ -123,41 +123,8 @@
             </div>
         </div>
 
-        <!-- Gráficos -->
-        {% if transacoes %}
-        <div class="row g-4 mb-4">
-            <!-- Gráfico de Evolução do Saldo -->
-            <div class="col-lg-8 animate-fadein" style="animation-delay: 0.6s;">
-                <div class="card chart-card">
-                    <div class="card-header">
-                        <h5 class="mb-0"><i class="bi bi-graph-up-arrow"></i> Evolução do Saldo</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="chart-container" style="height: 300px;">
-                            <canvas id="saldoChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Gráfico de Pizza - Categorias -->
-            <div class="col-lg-4 animate-fadein" style="animation-delay: 0.7s;">
-                <div class="card chart-card">
-                    <div class="card-header">
-                        <h5 class="mb-0"><i class="bi bi-pie-chart-fill"></i> Por Categoria</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="chart-container" style="height: 300px;">
-                            <canvas id="categoriesChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        {% endif %}
-
         <!-- Lista de Transações -->
-        <div class="card transaction-card animate-fadein" style="animation-delay: 0.8s;">
+        <div class="card transaction-card animate-fadein" style="animation-delay: 0.6s;">
             <div class="card-header">
                 <h5 class="mb-0"><i class="bi bi-clock-history"></i> Histórico Detalhado</h5>
             </div>
@@ -227,6 +194,14 @@
 
 <style>
 /* Estilos específicos do extrato */
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 0 20px 0;
+    border-bottom: 1px solid var(--galaxy-border);
+}
+
 .filter-card {
     background: var(--gradient-card);
     border: 1px solid var(--galaxy-border);
@@ -241,80 +216,110 @@
     width: 100%;
 }
 
+/* Transaction List Styles */
+.transaction-list {
+    padding: 0;
+}
+
+.transaction-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--galaxy-border);
+    transition: all 0.3s ease;
+}
+
+.transaction-item:hover {
+    background: var(--galaxy-light);
+    transform: translateX(4px);
+}
+
+.transaction-item:last-child {
+    border-bottom: none;
+}
+
+.transaction-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    color: white;
+    margin-right: 16px;
+    flex-shrink: 0;
+}
+
+.transaction-icon-success {
+    background: var(--gradient-success);
+}
+
+.transaction-icon-danger {
+    background: var(--gradient-error);
+}
+
+.transaction-details {
+    flex: 1;
+}
+
+.transaction-title {
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--galaxy-text);
+    margin-bottom: 4px;
+}
+
 .transaction-description {
     font-size: 13px;
     color: var(--galaxy-text-secondary);
-    margin-bottom: 2px;
+    margin-bottom: 4px;
+}
+
+.transaction-date {
+    font-size: 12px;
+    color: var(--galaxy-text-secondary);
+}
+
+.transaction-amount {
+    font-size: 18px;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+.transaction-amount-positive {
+    color: var(--galaxy-success);
+}
+
+.transaction-amount-negative {
+    color: var(--galaxy-error);
+}
+
+/* Empty State */
+.empty-state {
+    text-align: center;
+    padding: 60px 20px;
+}
+
+.empty-state-icon {
+    font-size: 64px;
+    color: #ddd;
+    margin-bottom: 20px;
+}
+
+.empty-state-title {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--galaxy-text);
+    margin-bottom: 12px;
+}
+
+.empty-state-text {
+    font-size: 14px;
+    color: var(--galaxy-text-secondary);
+    margin-bottom: 0;
 }
 </style>
 
-{% if transacoes %}
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Preparar dados das transações
-    const transacoes = [
-        {% for t in transacoes %}
-        {
-            data: '{{ t.data_transacao|date:"Y-m-d" }}',
-            valor: {{ t.valor }},
-            eh_entrada: {{ t.eh_entrada|lower }},
-            tipo: '{{ t.tipo }}'
-        }{% if not forloop.last %},{% endif %}
-        {% endfor %}
-    ];
-
-    // Agrupar por data e calcular saldo acumulado
-    const dadosPorData = {};
-    let saldoAtual = {{ cliente.saldo }} - {{ saldo_periodo }};
-    
-    transacoes.reverse().forEach(t => {
-        if (!dadosPorData[t.data]) {
-            dadosPorData[t.data] = saldoAtual;
-        }
-        saldoAtual += t.eh_entrada ? parseFloat(t.valor) : -parseFloat(t.valor);
-        dadosPorData[t.data] = saldoAtual;
-    });
-
-    const datasOrdenadas = Object.keys(dadosPorData).sort();
-    const saldos = datasOrdenadas.map(d => dadosPorData[d]);
-    const labels = datasOrdenadas.map(d => {
-        const date = new Date(d + 'T00:00:00');
-        return date.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' });
-    });
-
-    // Gráfico de Linha - Evolução do Saldo
-    if (labels.length > 0) {
-        GalaxyCharts.createLineChart('saldoChart', labels, saldos, {
-            label: 'Saldo',
-            showLegend: false
-        });
-    }
-
-    // Gráfico de Pizza - Por Categoria
-    const categorias = {
-        'Depósitos': 0,
-        'Transferências Enviadas': 0,
-        'Transferências Recebidas': 0,
-        'Compras': 0
-    };
-
-    transacoes.forEach(t => {
-        const valor = parseFloat(t.valor);
-        if (t.tipo === 'deposito') categorias['Depósitos'] += valor;
-        else if (t.tipo === 'transferencia_enviada') categorias['Transferências Enviadas'] += valor;
-        else if (t.tipo === 'transferencia_recebida') categorias['Transferências Recebidas'] += valor;
-        else if (t.tipo === 'compra') categorias['Compras'] += valor;
-    });
-
-    const categoriasLabels = Object.keys(categorias).filter(k => categorias[k] > 0);
-    const categoriasValores = categoriasLabels.map(k => categorias[k]);
-
-    if (categoriasLabels.length > 0) {
-        GalaxyCharts.createPieChart('categoriesChart', categoriasLabels, categoriasValores, {
-            showLegend: true
-        });
-    }
-});
-</script>
-{% endif %}
 {% endblock %}

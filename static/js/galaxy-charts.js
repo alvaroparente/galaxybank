@@ -3,18 +3,35 @@
 // Sistema de gráficos modernos usando Chart.js
 // ================================================
 
-// Configuração global do Chart.js
-Chart.defaults.font.family = '-apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", "Roboto", sans-serif';
-Chart.defaults.font.size = 13;
-Chart.defaults.color = '#636E72';
-Chart.defaults.borderColor = '#E8ECEF';
-Chart.defaults.plugins.legend.display = true;
-Chart.defaults.plugins.legend.position = 'bottom';
-Chart.defaults.plugins.tooltip.backgroundColor = 'rgba(26, 29, 41, 0.95)';
-Chart.defaults.plugins.tooltip.padding = 12;
-Chart.defaults.plugins.tooltip.cornerRadius = 8;
-Chart.defaults.plugins.tooltip.titleColor = '#FFFFFF';
-Chart.defaults.plugins.tooltip.bodyColor = '#F5F7FA';
+// Aguardar carregamento do DOM
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initChartDefaults);
+} else {
+    initChartDefaults();
+}
+
+function initChartDefaults() {
+    // Verificar se Chart.js está carregado
+    if (typeof Chart === 'undefined') {
+        console.error('Chart.js não foi carregado!');
+        return;
+    }
+
+    // Configuração global do Chart.js
+    Chart.defaults.font.family = '-apple-system, BlinkMacSystemFont, "Segoe UI", "Inter", "Roboto", sans-serif';
+    Chart.defaults.font.size = 13;
+    Chart.defaults.color = '#636E72';
+    Chart.defaults.borderColor = '#E8ECEF';
+    Chart.defaults.plugins.legend.display = true;
+    Chart.defaults.plugins.legend.position = 'bottom';
+    Chart.defaults.plugins.tooltip.backgroundColor = 'rgba(26, 29, 41, 0.95)';
+    Chart.defaults.plugins.tooltip.padding = 12;
+    Chart.defaults.plugins.tooltip.cornerRadius = 8;
+    Chart.defaults.plugins.tooltip.titleColor = '#FFFFFF';
+    Chart.defaults.plugins.tooltip.bodyColor = '#F5F7FA';
+    
+    console.log('✅ Chart.js defaults configurados');
+}
 
 // Paleta de cores moderna
 const modernColors = {

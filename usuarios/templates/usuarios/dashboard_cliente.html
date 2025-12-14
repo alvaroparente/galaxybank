@@ -178,78 +178,112 @@
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Grid de Conteúdo -->
-        <div class="row g-4">
-            <!-- Últimas Transações -->
-            <div class="col-lg-8 animate-fadein" style="animation-delay: 0.6s;">
-                <div class="card transaction-card">
-                    <div class="card-header">
-                        <h5 class="mb-0"><i class="bi bi-clock-history"></i> Últimas Transações</h5>
-                    </div>
-                    <div class="card-body p-0">
-                        {% if ultimas_transacoes %}
-                        <div class="transaction-list">
-                            {% for transacao in ultimas_transacoes %}
-                            <div class="transaction-item">
-                                <div class="d-flex align-items-center">
-                                    <div class="transaction-icon {% if transacao.eh_entrada %}transaction-icon-success{% else %}transaction-icon-danger{% endif %}">
-                                        {% if transacao.tipo == 'deposito' %}
-                                            <i class="bi bi-plus-lg"></i>
-                                        {% elif transacao.tipo == 'transferencia_enviada' %}
-                                            <i class="bi bi-arrow-up-right"></i>
-                                        {% elif transacao.tipo == 'transferencia_recebida' %}
-                                            <i class="bi bi-arrow-down-left"></i>
-                                        {% elif transacao.tipo == 'compra' %}
-                                            <i class="bi bi-bag"></i>
-                                        {% else %}
-                                            <i class="bi bi-currency-dollar"></i>
-                                        {% endif %}
-                                    </div>
-                                    <div class="transaction-details">
-                                        <div class="transaction-title">{{ transacao.get_tipo_display }}</div>
-                                        <div class="transaction-date">{{ transacao.data_transacao|date:"d/m/Y H:i" }}</div>
-                                    </div>
-                                </div>
-                                <div class="transaction-amount {% if transacao.eh_entrada %}transaction-amount-positive{% else %}transaction-amount-negative{% endif %}">
-                                    {% if transacao.eh_entrada %}+{% else %}-{% endif %}R$ {{ transacao.valor|floatformat:2 }}
-                                </div>
-                            </div>
-                            {% endfor %}
+            <!-- Gráficos de Visão Geral -->
+            {% if ultimas_transacoes %}
+            <div class="row g-4 mb-4">
+                <!-- Gráfico de Evolução Semanal -->
+                <div class="col-lg-8 animate-fadein" style="animation-delay: 0.6s;">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="bi bi-graph-up-arrow"></i> Movimentação dos Últimos 7 Dias</h5>
                         </div>
+                        <div class="card-body">
+                            <div class="chart-container" style="height: 280px;">
+                                <canvas id="dashboardMovimentacaoChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gráfico de Entradas vs Saídas -->
+                <div class="col-lg-4 animate-fadein" style="animation-delay: 0.7s;">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="bi bi-pie-chart-fill"></i> Entradas vs Saídas</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container" style="height: 280px;">
+                                <canvas id="dashboardBalanceChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Grid de Conteúdo -->
+            <div class="row g-4">
+                <!-- Últimas Transações -->
+                <div class="col-lg-8 animate-fadein" style="animation-delay: 0.8s;">
+                    <div class="card transaction-card">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="bi bi-clock-history"></i> Últimas Transações</h5>
+                        </div>
+                        <div class="card-body p-0">
+                            {% if ultimas_transacoes %}
+                                <div class="transaction-list">
+                                    {% for transacao in ultimas_transacoes %}
+                                    <div class="transaction-item">
+                                        <div class="d-flex align-items-center">
+                                            <div class="transaction-icon {% if transacao.eh_entrada %}transaction-icon-success{% else %}transaction-icon-danger{% endif %}">
+                                                {% if transacao.tipo == 'deposito' %}
+                                                    <i class="bi bi-plus-lg"></i>
+                                                {% elif transacao.tipo == 'transferencia_enviada' %}
+                                                    <i class="bi bi-arrow-up-right"></i>
+                                                {% elif transacao.tipo == 'transferencia_recebida' %}
+                                                    <i class="bi bi-arrow-down-left"></i>
+                                                {% elif transacao.tipo == 'compra' %}
+                                                    <i class="bi bi-bag"></i>
+                                                {% else %}
+                                                    <i class="bi bi-currency-dollar"></i>
+                                                {% endif %}
+                                            </div>
+                                            <div class="transaction-details">
+                                                <div class="transaction-title">{{ transacao.get_tipo_display }}</div>
+                                                <div class="transaction-date">{{ transacao.data_transacao|date:"d/m/Y H:i" }}</div>
+                                            </div>
+                                        </div>
+                                        <div class="transaction-amount {% if transacao.eh_entrada %}transaction-amount-positive{% else %}transaction-amount-negative{% endif %}">
+                                            {% if transacao.eh_entrada %}+{% else %}-{% endif %}R$ {{ transacao.valor|floatformat:2 }}
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                <div class="empty-state">
+                                    <div class="empty-state-icon">
+                                        <i class="bi bi-inbox"></i>
+                                    </div>
+                                    <h5 class="empty-state-title">Nenhuma transação ainda</h5>
+                                    <p class="empty-state-text">Comece fazendo um depósito ou transferência</p>
+                                    <div class="empty-state-actions">
+                                        <a href="{% url 'usuarios:deposito' %}" class="btn btn-success btn-sm me-2">
+                                            <i class="bi bi-plus-circle"></i> Fazer Depósito
+                                        </a>
+                                        <a href="{% url 'usuarios:transferencia' %}" class="btn btn-primary btn-sm">
+                                            <i class="bi bi-arrow-left-right"></i> Transferir
+                                        </a>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        </div>
+                        {% if ultimas_transacoes %}
                         <div class="card-footer text-center">
                             <a href="{% url 'usuarios:extrato' %}" class="btn btn-outline-primary btn-sm">
                                 Ver Extrato Completo <i class="bi bi-arrow-right"></i>
                             </a>
                         </div>
-                        {% else %}
-                        <div class="empty-state">
-                            <div class="empty-state-icon">
-                                <i class="bi bi-inbox"></i>
-                            </div>
-                            <h5 class="empty-state-title">Nenhuma transação ainda</h5>
-                            <p class="empty-state-text">Comece fazendo um depósito ou transferência</p>
-                            <div class="empty-state-actions">
-                                <a href="{% url 'usuarios:deposito' %}" class="btn btn-success btn-sm me-2">
-                                    <i class="bi bi-plus-circle"></i> Fazer Depósito
-                                </a>
-                                <a href="{% url 'usuarios:transferencia' %}" class="btn btn-primary btn-sm">
-                                    <i class="bi bi-arrow-left-right"></i> Transferir
-                                </a>
-                            </div>
-                        </div>
                         {% endif %}
                     </div>
                 </div>
-            </div>
 
-            <!-- Cartão Lateral - Ofertas -->
-            <div class="col-lg-4 animate-fadein" style="animation-delay: 0.7s;">
-                <div class="card promo-card mb-4">
-                    <div class="card-header">
-                        <h5 class="mb-0"><i class="bi bi-gift-fill"></i> Ofertas Especiais</h5>
-                    </div>
+                <!-- Cartão Lateral - Ofertas -->
+                <div class="col-lg-4 animate-fadein" style="animation-delay: 0.9s;">
+                    <div class="card promo-card">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="bi bi-gift-fill"></i> Ofertas Especiais</h5>
+                        </div>
                     <div class="card-body">
                         <div class="promo-item" style="background: var(--gradient-secondary);">
                             <div class="promo-icon">
@@ -279,8 +313,6 @@
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
                 </div>
             </div>
         </div>
@@ -498,4 +530,105 @@
     opacity: 0.9;
 }
 </style>
+
+{% if ultimas_transacoes %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🎨 Iniciando gráficos do dashboard...');
+    
+    // Verificar se Chart.js e GalaxyCharts estão disponíveis
+    if (typeof Chart === 'undefined') {
+        console.error('❌ Chart.js não carregado!');
+        return;
+    }
+    
+    if (typeof GalaxyCharts === 'undefined') {
+        console.error('❌ GalaxyCharts não carregado!');
+        return;
+    }
+    
+    console.log('✅ Chart.js e GalaxyCharts carregados');
+
+    // Preparar dados das transações
+    const transacoes = [
+        {% for t in ultimas_transacoes %}
+        {
+            data: '{{ t.data_transacao|date:"Y-m-d" }}',
+            valor: parseFloat({{ t.valor }}),
+            eh_entrada: {{ t.eh_entrada|yesno:"true,false" }},
+            tipo: '{{ t.tipo }}'
+        }{% if not forloop.last %},{% endif %}
+        {% endfor %}
+    ];
+    
+    console.log('📊 Transações carregadas:', transacoes.length);
+
+    try {
+        // Gráfico 1: Movimentação dos Últimos 7 Dias (Linha)
+        const ultimosDias = 7;
+        const hoje = new Date();
+        const dadosDiarios = {};
+        
+        // Criar estrutura para os últimos 7 dias
+        for (let i = ultimosDias - 1; i >= 0; i--) {
+            const data = new Date(hoje);
+            data.setDate(data.getDate() - i);
+            const dataStr = data.toISOString().split('T')[0];
+            dadosDiarios[dataStr] = { entradas: 0, saidas: 0 };
+        }
+        
+        // Preencher com dados reais
+        transacoes.forEach(t => {
+            if (dadosDiarios[t.data]) {
+                if (t.eh_entrada) {
+                    dadosDiarios[t.data].entradas += t.valor;
+                } else {
+                    dadosDiarios[t.data].saidas += t.valor;
+                }
+            }
+        });
+        
+        const datasOrdenadas = Object.keys(dadosDiarios).sort();
+        const entradas = datasOrdenadas.map(d => dadosDiarios[d].entradas);
+        const saidas = datasOrdenadas.map(d => dadosDiarios[d].saidas);
+        const labels = datasOrdenadas.map(d => {
+            const parts = d.split('-');
+            const date = new Date(parts[0], parts[1] - 1, parts[2]);
+            return date.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' });
+        });
+        
+        console.log('📈 Criando gráfico de barras...');
+        GalaxyCharts.createBarChart('dashboardMovimentacaoChart', labels, entradas, saidas, {
+            showLegend: true
+        });
+        
+        // Gráfico 2: Entradas vs Saídas (Donut)
+        const totalEntradas = transacoes
+            .filter(t => t.eh_entrada)
+            .reduce((sum, t) => sum + t.valor, 0);
+        
+        const totalSaidas = transacoes
+            .filter(t => !t.eh_entrada)
+            .reduce((sum, t) => sum + t.valor, 0);
+        
+        if (totalEntradas > 0 || totalSaidas > 0) {
+            console.log('🥧 Criando gráfico de donut...');
+            GalaxyCharts.createDoughnutChart('dashboardBalanceChart', 
+                ['Entradas', 'Saídas'], 
+                [totalEntradas, totalSaidas], 
+                {
+                    showLegend: true
+                }
+            );
+        }
+        
+        console.log('✅ Gráficos criados com sucesso!');
+        
+    } catch (error) {
+        console.error('❌ Erro ao criar gráficos:', error);
+    }
+});
+</script>
+{% endif %}
+
 {% endblock %}

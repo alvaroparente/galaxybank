@@ -282,7 +282,13 @@ def compras(request):
     
     try:
         cliente = Cliente.objects.get(usuario=request.user)
-        compras_cliente = cliente.compras.all()
+        
+        # Filtro por status
+        status_filtro = request.GET.get('status', '')
+        compras_cliente = cliente.compras.all().order_by('-data_compra')
+        
+        if status_filtro:
+            compras_cliente = compras_cliente.filter(status=status_filtro)
         
         # Paginação
         paginator = Paginator(compras_cliente, 10)
@@ -292,6 +298,8 @@ def compras(request):
         context = {
             'page_obj': page_obj,
             'cliente': cliente,
+            'is_paginated': paginator.num_pages > 1,
+            'status_filtro': status_filtro,
         }
         
         return render(request, 'loja/compras.html', context)

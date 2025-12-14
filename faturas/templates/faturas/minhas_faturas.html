@@ -100,7 +100,7 @@
         {% if faturas %}
         <div class="row g-4">
             {% for fatura in faturas %}
-            <div class="col-12 animate-fadein" style="animation-delay: {{ forloop.counter|add:5|floatformat:1|mul:"0.1" }}s;">
+            <div class="col-12 animate-fadein" style="animation-delay: 0.{{ forloop.counter }}s;">
                 <div class="card fatura-card">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <div>
