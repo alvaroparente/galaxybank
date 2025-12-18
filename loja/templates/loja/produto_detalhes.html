@@ -94,24 +94,21 @@
                             </div>
                             
                             <!-- Quantidade e Comprar -->
-                            <form method="post" action="{% url 'loja:adicionar_carrinho' produto.id %}">
-                                {% csrf_token %}
-                                <div class="row align-items-end mb-3">
-                                    <div class="col-md-4">
-                                        <label for="quantidade" class="form-label">Quantidade:</label>
-                                        <div class="input-group">
-                                            <button class="btn btn-outline-secondary" type="button" id="diminuir">-</button>
-                                            <input type="number" class="form-control text-center" id="quantidade" name="quantidade" value="1" min="1" max="10">
-                                            <button class="btn btn-outline-secondary" type="button" id="aumentar">+</button>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-8">
-                                        <button type="submit" class="btn btn-primary btn-lg w-100">
-                                            <i class="bi bi-cart-plus"></i> Adicionar ao Carrinho
-                                        </button>
+                            <div class="row align-items-end mb-3">
+                                <div class="col-md-4">
+                                    <label for="quantidade" class="form-label">Quantidade:</label>
+                                    <div class="input-group">
+                                        <button class="btn btn-outline-secondary" type="button" id="diminuir">-</button>
+                                        <input type="number" class="form-control text-center" id="quantidade" name="quantidade" value="1" min="1" max="10">
+                                        <button class="btn btn-outline-secondary" type="button" id="aumentar">+</button>
                                     </div>
                                 </div>
-                            </form>
+                                <div class="col-md-8">
+                                    <button type="button" class="btn btn-primary btn-lg w-100" onclick="adicionarAoCarrinho()">
+                                        <i class="bi bi-cart-plus"></i> Adicionar ao Carrinho
+                                    </button>
+                                </div>
+                            </div>
                             
                             <!-- Informações de Saldo -->
                             <div class="row">
@@ -180,6 +177,38 @@
 </div>
 
 <script>
+function adicionarAoCarrinho() {
+    const quantidade = document.getElementById('quantidade').value;
+    const produtoId = {{ produto.id }};
+    
+    fetch(`/loja/adicionar-carrinho/${produtoId}/`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: JSON.stringify({ quantidade: quantidade })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showSuccessNotification(data.message);
+            
+            // Atualizar contador do carrinho no header se existir
+            const carrinhoCount = document.querySelector('.cart-count');
+            if (carrinhoCount) {
+                carrinhoCount.textContent = data.quantidade_carrinho;
+            }
+        } else {
+            showErrorNotification(data.message || 'Erro ao adicionar ao carrinho');
+        }
+    })
+    .catch(error => {
+        console.error('Erro:', error);
+        showErrorNotification('Erro ao adicionar produto ao carrinho');
+    });
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     const quantidadeInput = document.getElementById('quantidade');
     const diminuirBtn = document.getElementById('diminuir');
